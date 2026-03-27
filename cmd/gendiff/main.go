@@ -1,21 +1,22 @@
+// Package main implements a CLI utility to get the difference between two files like git diff
 package main
 
 import (
+	"code"
 	"code/parser"
 	"context"
 	"errors"
 	"fmt"
 	"log"
 	"os"
-	
-	"code"
+
 	"github.com/urfave/cli/v3"
 )
 
 func main() {
 	cmd := &cli.Command{
-		Name:  "gendiff",
-		Usage: "Compares two configuration files and shows a difference.",
+		Name:                  "gendiff",
+		Usage:                 "Compares two configuration files and shows a difference.",
 		EnableShellCompletion: true,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
@@ -39,6 +40,7 @@ func main() {
 			if err1 != nil {
 				return err1
 			}
+
 			if err2 != nil {
 				return err2
 			}

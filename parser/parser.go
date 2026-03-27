@@ -1,3 +1,4 @@
+// Package parser  provides functions for parsing files (json, yml)
 package parser
 
 import (
@@ -6,9 +7,7 @@ import (
 	"os"
 )
 
-// - некие заметки насчет путей (абсолютные и относительные пути)
-// - определить формат по расширению файла
-
+// Parse function returns a json-like structure
 func Parse(path string) (any, error) {
 	fileInfo, err := os.Stat(path)
 	if err != nil {

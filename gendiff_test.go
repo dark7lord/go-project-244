@@ -1,14 +1,12 @@
 package code_test
 
 import (
+	"code"
+	"code/parser"
 	"os"
 	"strings"
 	"testing"
-
-	"code"
-	"code/parser"
 )
-
 
 func TestGendiff(t *testing.T) {
 	pathA := "testdata/file1.json"
@@ -20,13 +18,14 @@ func TestGendiff(t *testing.T) {
 	if errA != nil || errB != nil {
 		t.Fatal("error parsing file")
 	}
-	
+
 	got := strings.TrimSpace(code.GenDiff(dataA, dataB))
 
 	expected, err := os.ReadFile("testdata/expected.txt")
 	if err != nil {
 		t.Fatal("error reading file with expected result")
 	}
+
 	want := strings.TrimSpace(string(expected))
 
 	if want != got {

@@ -1,3 +1,5 @@
+// Package code provides functions for getting the difference
+// between files
 package code
 
 import (
@@ -29,6 +31,7 @@ func isEqual(a, b any) bool {
 	return a == b
 }
 
+// GenDiff function returns the difference between two structures as a string
 func GenDiff(dataA, dataB any) string {
 	mapA := dataA.(map[string]any)
 	mapB := dataB.(map[string]any)
@@ -60,6 +63,7 @@ func GenDiff(dataA, dataB any) string {
 	}
 
 	pad := "  "
+
 	var builder strings.Builder
 
 	writeRow := func(prefix, key string, value any) {
@@ -67,13 +71,15 @@ func GenDiff(dataA, dataB any) string {
 		if value == nil {
 			normalizedValue = "null"
 		}
+
 		builder.WriteString(pad)
-		builder.WriteString(fmt.Sprintf("%s %s: %v", prefix, key, normalizedValue))
+		fmt.Fprintf(&builder, "%s %s: %v", prefix, key, normalizedValue)
 		builder.WriteRune('\n')
 	}
 
 	slices.Sort(keys)
 	builder.WriteString("{\n")
+
 	for _, key := range keys {
 		switch result[key] {
 		case "unchanged":
@@ -87,6 +93,8 @@ func GenDiff(dataA, dataB any) string {
 			writeRow("+", key, mapB[key])
 		}
 	}
+
 	builder.WriteString("}")
+
 	return builder.String()
 }
