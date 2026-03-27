@@ -1,14 +1,14 @@
 package main
 
 import (
-	"code"
 	"code/parser"
 	"context"
 	"errors"
 	"fmt"
 	"log"
 	"os"
-
+	
+	"code"
 	"github.com/urfave/cli/v3"
 )
 
@@ -16,6 +16,7 @@ func main() {
 	cmd := &cli.Command{
 		Name:  "gendiff",
 		Usage: "Compares two configuration files and shows a difference.",
+		EnableShellCompletion: true,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "format",
