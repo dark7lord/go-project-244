@@ -1,0 +1,9 @@
+{
+  + arr: []
+  - follow: false
+  + follow: true
+    host: hexlet.io
+  + port: null
+    proxy: 123.234.53.22
+    timeout: 50
+}

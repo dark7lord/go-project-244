@@ -13,7 +13,10 @@ fmt:
 test:
 	go test
 
-run:
-	@go run ./cmd/gendiff/main.go
+cover:
+	go test -coverprofile=coverage.out
+	go tool cover -func=coverage.out
+# 	go tool cover -html=coverage.out
+
 
 .PHONY: test fmt lint-fix lint build run

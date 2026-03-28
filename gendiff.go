@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+const unknownType = "unknown type"
+
 func typeVar(variable any) string {
 	switch variable.(type) {
 	case float64:
@@ -19,11 +21,19 @@ func typeVar(variable any) string {
 	case nil:
 		return "null"
 	default:
-		return "unknown type"
+		return unknownType
 	}
 }
 
 func isEqual(a, b any) bool {
+	typeA := typeVar(a)
+	typeB := typeVar(b)
+
+	// для сложных структур которые нельзя сравнить
+	if typeA == unknownType || typeB == unknownType {
+		return false
+	}
+
 	if typeVar(a) != typeVar(b) {
 		return false
 	}
