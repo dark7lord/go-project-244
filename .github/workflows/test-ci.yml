@@ -35,7 +35,7 @@ jobs:
           go-version: '1.25.0' # after release golangci-lint-action@v6 need update to 1.25.0
           cache: true
       - name: Install golangci-lint
-        uses: golangci/golangci-lint-action@v9
+        uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20
         with:
           version: latest
       - name: Run linters
@@ -55,6 +55,6 @@ jobs:
         with:
           name: coverage
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v2
+        uses: SonarSource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
