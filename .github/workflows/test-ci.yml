@@ -21,7 +21,7 @@ jobs:
       - name: Generate coverage report
         run: make cover
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: coverage.out
