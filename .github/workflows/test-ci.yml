@@ -54,7 +54,7 @@ jobs:
       - name: Download coverage artifact
         uses: actions/download-artifact@v4
         with:
-          name: coverage# генерирует coverage.out
+          name: coverage
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v2
         env:

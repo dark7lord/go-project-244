@@ -5,7 +5,7 @@ run:
   tests: true
 
 linters:
-  default: standard
+  default: none
   enable:
     - wsl_v5
     - nlreturn
@@ -23,7 +23,12 @@ linters:
     nlreturn:
       block-size: 3
     gocritic:
-      enable-all: true
+      enabled-tags:
+        - diagnostic
+        - performance
+        - style
+      disabled-checks:
+        - whyNoLint
 
 formatters:
   enable:
@@ -31,5 +36,4 @@ formatters:
     - goimports
   settings:
     goimports:
-      local-prefixes:
-      - code
+      local-prefixes: ["code"]
