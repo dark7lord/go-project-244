@@ -14,7 +14,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func main() {
+func Run() error {
 	cmd := &cli.Command{
 		Name:                  "gendiff",
 		Usage:                 "Compares two configuration files and shows a difference.",
@@ -53,8 +53,11 @@ func main() {
 		},
 	}
 
-	err := cmd.Run(context.Background(), os.Args)
-	if err != nil {
+	return cmd.Run(context.Background(), os.Args)
+}
+
+func main() {
+	if err := Run(); err != nil {
 		log.Fatal(err)
 	}
 }
