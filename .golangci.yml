@@ -19,7 +19,6 @@ linters:
     - ineffassign
     - unused
     - misspell
-
   settings:
     nlreturn:
       block-size: 3
@@ -31,3 +30,7 @@ formatters:
     - gofmt
     - goimports
     - gofumpt
+  settings:
+    goimports:
+      local-prefixes:
+      - code

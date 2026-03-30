@@ -2,13 +2,14 @@
 package main
 
 import (
-	"code"
-	"code/parser"
 	"context"
 	"errors"
 	"fmt"
 	"log"
 	"os"
+
+	"code"
+	"code/parsers"
 
 	"github.com/urfave/cli/v3"
 )
@@ -34,8 +35,8 @@ func main() {
 			filepath1 := cmd.Args().Get(0)
 			filepath2 := cmd.Args().Get(1)
 
-			filedata1, err1 := parser.Parse(filepath1)
-			filedata2, err2 := parser.Parse(filepath2)
+			filedata1, err1 := parsers.Parse(filepath1)
+			filedata2, err2 := parsers.Parse(filepath2)
 
 			if err1 != nil {
 				return err1

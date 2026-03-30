@@ -8,12 +8,18 @@ import (
 	"strings"
 )
 
-const unknownType = "unknown type"
+const (
+	unknownType = "unknown type"
+	num         = "number"
+	f64         = "float64"
+)
 
 func typeVar(variable any) string {
 	switch variable.(type) {
+	case int:
+		return num
 	case float64:
-		return "num"
+		return f64
 	case string:
 		return "string"
 	case bool:
@@ -29,9 +35,19 @@ func isEqual(a, b any) bool {
 	typeA := typeVar(a)
 	typeB := typeVar(b)
 
-	// для сложных структур которые нельзя сравнить
+	// for complex types, which must not be compared with == operator, we return false
 	if typeA == unknownType || typeB == unknownType {
 		return false
+	}
+
+	if typeA == num && typeB == f64 {
+		normA := float64(a.(int))
+		return normA == b.(float64)
+	}
+
+	if typeB == num && typeA == f64 {
+		normB := float64(b.(int))
+		return a.(float64) == normB
 	}
 
 	if typeVar(a) != typeVar(b) {

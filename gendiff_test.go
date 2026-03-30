@@ -1,11 +1,12 @@
 package code_test
 
 import (
-	"code"
-	"code/parser"
 	"os"
 	"strings"
 	"testing"
+
+	"code"
+	"code/parsers"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,11 +24,25 @@ func readFileToString(t *testing.T, path string) string {
 func parseFile(t *testing.T, path string) any {
 	t.Helper()
 
-	data, err := parser.Parse(path)
+	data, err := parsers.Parse(path)
 	require.NoError(t, err, "failed to parse file %s", path)
 
 	return data
 }
+
+const (
+	fixtureDir = "testdata/fixture"
+	fileA      = fixtureDir + "/fileA.json"
+	fileB      = fixtureDir + "/fileB.json"
+	fileC      = fixtureDir + "/fileC.json"
+	fileD      = fixtureDir + "/fileD.json"
+	fileAYaml  = fixtureDir + "/fileA.yml"
+	fileBYaml  = fixtureDir + "/fileB.yml"
+	expectedAB = fixtureDir + "/expectedAB.txt"
+	expectedAC = fixtureDir + "/expectedAC.txt"
+	expectedCD = fixtureDir + "/expectedCD.txt"
+	expectedAA = fixtureDir + "/expectedAA.txt"
+)
 
 func TestGendiff(t *testing.T) {
 	tests := []struct {
@@ -38,21 +53,39 @@ func TestGendiff(t *testing.T) {
 	}{
 		{
 			name:         "AB",
-			pathA:        "testdata/fixture/fileA.json",
-			pathB:        "testdata/fixture/fileB.json",
-			expectedPath: "testdata/fixture/expectedAB.txt",
+			pathA:        fileA,
+			pathB:        fileB,
+			expectedPath: expectedAB,
 		},
 		{
 			name:         "AC",
-			pathA:        "testdata/fixture/fileA.json",
-			pathB:        "testdata/fixture/fileC.json",
-			expectedPath: "testdata/fixture/expectedAC.txt",
+			pathA:        fileA,
+			pathB:        fileC,
+			expectedPath: expectedAC,
 		},
 		{
 			name:         "CD",
-			pathA:        "testdata/fixture/fileC.json",
-			pathB:        "testdata/fixture/fileD.json",
-			expectedPath: "testdata/fixture/expectedCD.txt",
+			pathA:        fileC,
+			pathB:        fileD,
+			expectedPath: expectedCD,
+		},
+		{
+			name:         "AA json vs yaml",
+			pathA:        fileA,
+			pathB:        fileAYaml,
+			expectedPath: expectedAA,
+		},
+		{
+			name:         "AA yaml vs json",
+			pathA:        fileAYaml,
+			pathB:        fileA,
+			expectedPath: expectedAA,
+		},
+		{
+			name:         "AB yaml",
+			pathA:        fileAYaml,
+			pathB:        fileBYaml,
+			expectedPath: expectedAB,
 		},
 	}
 
