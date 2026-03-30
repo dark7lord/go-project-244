@@ -29,7 +29,6 @@ formatters:
   enable:
     - gofmt
     - goimports
-    - gofumpt
   settings:
     goimports:
       local-prefixes:
