@@ -35,10 +35,9 @@ jobs:
           go-version: '1.25.0' # after release golangci-lint-action@v6 need update to 1.25.0
           cache: true
       - name: Install golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: latest 
-          install-mode: goinstall
+          version: latest
       - name: Run linters
         run: make lint
   

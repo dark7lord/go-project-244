@@ -5,9 +5,8 @@ run:
   tests: true
 
 linters:
-  default: none
+  default: standard
   enable:
-    - wsl_v5
     - nlreturn
     - gocritic
     - errcheck
@@ -22,17 +21,6 @@ linters:
   settings:
     nlreturn:
       block-size: 3
-    gocritic:
-      enabled-tags:
-        - diagnostic
-        - performance
-        - style
-      disabled-checks:
-        - whyNoLint
-    wsl_v5:
-      allow-first-in-block: true
-      allow-whole-block: false
-      branch-max-lines: 2
 
 formatters:
   enable:
