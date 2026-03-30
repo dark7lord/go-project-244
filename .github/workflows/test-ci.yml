@@ -16,7 +16,15 @@ jobs:
         with:
           go-version: '1.25.0'
           cache: true
-      - run: make test
+      - name: Run tests
+        run: make test
+      - name: Generate coverage report
+        run: make cover
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: coverage.out
 
   lint:
     runs-on: ubuntu-slim
@@ -26,3 +34,23 @@ jobs:
         with:
           go-version: '1.25.0'
           cache: true
+      - name: Run linters
+        run: make lint
+  
+  sonar:
+    runs-on: ubuntu-slim
+    needs: test
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.0'
+          cache: true
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage# генерирует coverage.out
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
