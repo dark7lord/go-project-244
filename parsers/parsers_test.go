@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"code/parsers"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"code/parsers"
 )
 
 func TestParse(t *testing.T) {

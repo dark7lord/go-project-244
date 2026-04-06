@@ -5,11 +5,11 @@ import (
 	"strings"
 	"testing"
 
-	"code"
-	"code/parsers"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"code"
+	"code/parsers"
 )
 
 func readFileToString(t *testing.T, path string) string {
@@ -36,15 +36,18 @@ const (
 	fileB      = fixtureDir + "/fileB.json"
 	fileC      = fixtureDir + "/fileC.json"
 	fileD      = fixtureDir + "/fileD.json"
+	fileE      = fixtureDir + "/fileE.json"
+	fileF      = fixtureDir + "/fileF.json"
 	fileAYaml  = fixtureDir + "/fileA.yml"
 	fileBYaml  = fixtureDir + "/fileB.yml"
-	expectedAB = fixtureDir + "/expectedAB.txt"
-	expectedAC = fixtureDir + "/expectedAC.txt"
-	expectedCD = fixtureDir + "/expectedCD.txt"
-	expectedAA = fixtureDir + "/expectedAA.txt"
+	expectedAB = fixtureDir + "/expectedAB.diff"
+	expectedAC = fixtureDir + "/expectedAC.diff"
+	expectedCD = fixtureDir + "/expectedCD.diff"
+	expectedAA = fixtureDir + "/expectedAA.diff"
+	expectedEF = fixtureDir + "/expectedEF.diff"
 )
 
-func TestGendiff(t *testing.T) {
+func TestGendiffFlat(t *testing.T) {
 	tests := []struct {
 		name         string
 		pathA        string
@@ -86,6 +89,12 @@ func TestGendiff(t *testing.T) {
 			pathA:        fileAYaml,
 			pathB:        fileBYaml,
 			expectedPath: expectedAB,
+		},
+		{
+			name:         "nested json files",
+			pathA:        fileE,
+			pathB:        fileF,
+			expectedPath: expectedEF,
 		},
 	}
 

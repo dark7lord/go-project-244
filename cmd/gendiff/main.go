@@ -8,10 +8,10 @@ import (
 	"log"
 	"os"
 
+	"github.com/urfave/cli/v3"
+
 	"code"
 	"code/parsers"
-
-	"github.com/urfave/cli/v3"
 )
 
 func Run() error {
