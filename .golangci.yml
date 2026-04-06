@@ -25,7 +25,10 @@ linters:
 formatters:
   enable:
     - gofmt
-    - goimports
+    - gci
   settings:
-    goimports:
-      local-prefixes: ["code"]
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(code)
