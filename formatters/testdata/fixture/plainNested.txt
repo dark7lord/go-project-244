@@ -1,3 +1,3 @@
 Property 'key2.nestedKey2' was added with value: 'addedNestedValue'
 Property 'key2.nestedKey3' was removed
-Property 'key2.nestedKey4.deepNestedKey' was changed. From 'oldDeepNestedValue' to 'newDeepNestedValue'
+Property 'key2.nestedKey4.deepNestedKey' was updated. From 'oldDeepNestedValue' to 'newDeepNestedValue'

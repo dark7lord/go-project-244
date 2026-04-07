@@ -170,7 +170,6 @@ func TestPrintDiff(t *testing.T) {
 			format: "plain",
 			path:   filepath.Join("testdata", "fixture", "plainNested.txt"),
 		},
-		// TODO: add [complex value]
 	}
 
 	for _, tt := range tests {
