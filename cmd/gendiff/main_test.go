@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -12,8 +13,8 @@ func TestRunSuccess(t *testing.T) {
 
 	os.Args = []string{
 		"gendiff",
-		"../../testdata/fixture/fileA.json",
-		"../../testdata/fixture/fileB.json",
+		filepath.Join("..", "..", "testdata", "fixture", "fileA.json"),
+		filepath.Join("..", "..", "testdata", "fixture", "fileB.json"),
 	}
 
 	err := Run()

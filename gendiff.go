@@ -1,13 +1,6 @@
 // Package code provides functions for getting the difference between files
 package code
 
-import (
-	"fmt"
-	"maps"
-	"slices"
-	"strings"
-)
-
 const (
 	unknownType = "unknown type"
 )
@@ -46,9 +39,9 @@ func isEqual(a, b any) bool {
 
 // Diff struct represents the difference between two values
 type Diff struct {
-	typeDiff string
-	oldValue any
-	newValue any
+	TypeDiff string
+	OldValue any
+	NewValue any
 }
 
 // yaml parser return int instead of float64
@@ -66,14 +59,14 @@ func genMapDiff(mapA, mapB map[string]any) map[string]any {
 	for key, valueA := range mapA {
 		normA := normalizeValue(valueA)
 		diff := Diff{
-			typeDiff: "unchanged",
-			oldValue: normA,
+			TypeDiff: "unchanged",
+			OldValue: normA,
 		}
 
 		valueB, ok := mapB[key]
 
 		if !ok {
-			diff.typeDiff = "removed"
+			diff.TypeDiff = "removed"
 			diffs[key] = diff
 
 			continue
@@ -81,9 +74,9 @@ func genMapDiff(mapA, mapB map[string]any) map[string]any {
 
 		normB := normalizeValue(valueB)
 
-		if (isPrimitive(normA) || isPrimitive(normB)) && !isEqual(normA, normB) {
-			diff.typeDiff = "changed"
-			diff.newValue = valueB
+		if (IsPrimitive(normA) || IsPrimitive(normB)) && !isEqual(normA, normB) {
+			diff.TypeDiff = "changed"
+			diff.NewValue = valueB
 			diffs[key] = diff
 
 			continue
@@ -93,7 +86,7 @@ func genMapDiff(mapA, mapB map[string]any) map[string]any {
 		rightValue, isRightMap := valueB.(map[string]any)
 
 		if isLeftMap && isRightMap {
-			diff.oldValue = genMapDiff(leftValue, rightValue)
+			diff.OldValue = genMapDiff(leftValue, rightValue)
 		}
 
 		diffs[key] = diff
@@ -102,8 +95,8 @@ func genMapDiff(mapA, mapB map[string]any) map[string]any {
 	for key, valueB := range mapB {
 		if _, ok := mapA[key]; !ok {
 			diffs[key] = Diff{
-				typeDiff: "added",
-				newValue: valueB,
+				TypeDiff: "added",
+				NewValue: valueB,
 			}
 		}
 	}
@@ -112,92 +105,20 @@ func genMapDiff(mapA, mapB map[string]any) map[string]any {
 }
 
 // GenDiff function returns the difference between two structures as a string
-func GenDiff(dataA, dataB any) string {
+func GenDiff(dataA, dataB any) any {
 	mapA := dataA.(map[string]any)
 	mapB := dataB.(map[string]any)
 	diff := genMapDiff(mapA, mapB)
 
-	return printDiff(diff, 0)
+	return diff
 }
 
-func isPrimitive(value any) bool {
+// IsPrimitive function checks if the value is a primitive type (string, number, boolean, or null)
+func IsPrimitive(value any) bool {
 	switch value.(type) {
 	case string, int, int64, float64, bool, nil:
 		return true
 	default:
 		return false
 	}
-}
-
-func printDiff(diff any, deep int) string {
-	if isPrimitive(diff) {
-		if diff == nil {
-			return "null"
-		}
-
-		return fmt.Sprintf("%v", diff)
-	}
-
-	var builder strings.Builder
-
-	writeValue := func(prefix, key string, value any, deep int) {
-		pad := strings.Repeat("  ", deep)
-		nl := ""
-		if isPrimitive(value) {
-			nl = "\n"
-		}
-		strValue := printDiff(value, deep+1)
-
-		if key == "" {
-			fmt.Fprintf(&builder, "%s%s %s%s", pad, prefix, strValue, nl)
-		}
-
-		fmt.Fprintf(&builder, "%s%s %s: %s%s", pad, prefix, key, strValue, nl)
-	}
-
-	pad := strings.Repeat("  ", deep)
-
-	switch v := diff.(type) {
-	case map[string]any:
-		keys := slices.Collect(maps.Keys(v))
-		slices.Sort(keys)
-		builder.WriteString("{\n")
-		for _, key := range keys {
-			d, isDiff := v[key].(Diff)
-
-			if !isDiff {
-				writeValue(" ", key, v[key], deep+1)
-				continue
-			}
-
-			switch d.typeDiff {
-			case "unchanged":
-				writeValue(" ", key, d.oldValue, deep+1)
-			case "added":
-				writeValue("+", key, d.newValue, deep+1)
-			case "removed":
-				writeValue("-", key, d.oldValue, deep+1)
-			case "changed":
-				writeValue("-", key, d.oldValue, deep+1)
-				writeValue("+", key, d.newValue, deep+1)
-			}
-		}
-
-		builder.WriteString(pad)
-		builder.WriteString("}\n")
-	case []any:
-		if len(v) == 0 {
-			builder.WriteString("[]\n")
-		} else {
-			builder.WriteString("[\n")
-			for _, item := range v {
-				writeValue(" ", "", item, deep+1)
-			}
-			builder.WriteString(pad)
-			builder.WriteString("]\n")
-
-		}
-	}
-
-	return builder.String()
 }

@@ -1,0 +1,21 @@
+{
+    key1: value1
+    key2: {
+        nestedKey: nestedValue
+    }
+  + key3: {
+        addedNestedKey: addedNestedValue
+    }
+  - key4: {
+        removedNestedKey: removedNestedValue
+    }
+  - key5: {
+        oldNestedKey: oldNestedValue
+    }
+  + key5: {
+        newNestedKey: newNestedValue
+    }
+    key6: {
+        unchangedNestedKey: unchangedNestedValue
+    }
+}

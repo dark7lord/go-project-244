@@ -12,6 +12,8 @@ import (
 	"code/parsers"
 )
 
+var fixtureDir = filepath.Join("..", "testdata", "fixture")
+
 func TestParse(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -31,17 +33,17 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name:    "invalid json",
-			path:    "../testdata/fixture/invalid.json",
+			path:    filepath.Join(fixtureDir, "invalid.json"),
 			wantErr: true,
 		},
 		{
 			name:    "invalid yml",
-			path:    "../testdata/fixture/invalid.yaml",
+			path:    filepath.Join(fixtureDir, "invalid.yaml"),
 			wantErr: true,
 		},
 		{
 			name: "valid json",
-			path: "../testdata/fixture/fileA.json",
+			path: filepath.Join(fixtureDir, "fileA.json"),
 			expected: map[string]any{
 				"host":    "hexlet.io",
 				"timeout": 50.0,
@@ -51,7 +53,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: "valid yml",
-			path: "../testdata/fixture/fileA.yml",
+			path: filepath.Join(fixtureDir, "fileA.yml"),
 			expected: map[string]any{
 				"host":    "hexlet.io",
 				"timeout": 50,
@@ -61,7 +63,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name:    "unsupported file type",
-			path:    "../testdata/fixture/fileA.xml",
+			path:    filepath.Join(fixtureDir, "fileA.xml"),
 			wantErr: true,
 		},
 	}

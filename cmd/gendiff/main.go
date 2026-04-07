@@ -11,6 +11,7 @@ import (
 	"github.com/urfave/cli/v3"
 
 	"code"
+	"code/formatters"
 	"code/parsers"
 )
 
@@ -24,12 +25,18 @@ func Run() error {
 				Name:        "format",
 				Aliases:     []string{"f"},
 				DefaultText: "stylish",
+				Value:       "stylish",
 				Usage:       "output format",
 			},
 		},
 		Action: func(_ context.Context, cmd *cli.Command) error {
 			if cmd.NArg() != 2 {
 				return errors.New("wrong number of args file paths")
+			}
+
+			format := cmd.String("format")
+			if format != "stylish" && format != "plain" {
+				return fmt.Errorf("unsupported format: %s", format)
 			}
 
 			filepath1 := cmd.Args().Get(0)
@@ -46,7 +53,8 @@ func Run() error {
 				return err2
 			}
 
-			result := code.GenDiff(filedata1, filedata2)
+			diff := code.GenDiff(filedata1, filedata2)
+			result := formatters.PrintDiff(diff, format)
 			fmt.Println(result)
 
 			return nil

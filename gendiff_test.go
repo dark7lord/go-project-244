@@ -2,6 +2,7 @@ package code_test
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"code"
+	"code/formatters"
 	"code/parsers"
 )
 
@@ -30,24 +32,11 @@ func parseFile(t *testing.T, path string) any {
 	return data
 }
 
-const (
-	fixtureDir = "testdata/fixture"
-	fileA      = fixtureDir + "/fileA.json"
-	fileB      = fixtureDir + "/fileB.json"
-	fileC      = fixtureDir + "/fileC.json"
-	fileD      = fixtureDir + "/fileD.json"
-	fileE      = fixtureDir + "/fileE.json"
-	fileF      = fixtureDir + "/fileF.json"
-	fileAYaml  = fixtureDir + "/fileA.yml"
-	fileBYaml  = fixtureDir + "/fileB.yml"
-	expectedAB = fixtureDir + "/expectedAB.diff"
-	expectedAC = fixtureDir + "/expectedAC.diff"
-	expectedCD = fixtureDir + "/expectedCD.diff"
-	expectedAA = fixtureDir + "/expectedAA.diff"
-	expectedEF = fixtureDir + "/expectedEF.diff"
-)
+func fixturePath(name string) string {
+	return filepath.Join("testdata", "fixture", name)
+}
 
-func TestGendiffFlat(t *testing.T) {
+func TestGendiff(t *testing.T) {
 	tests := []struct {
 		name         string
 		pathA        string
@@ -56,45 +45,45 @@ func TestGendiffFlat(t *testing.T) {
 	}{
 		{
 			name:         "AB",
-			pathA:        fileA,
-			pathB:        fileB,
-			expectedPath: expectedAB,
+			pathA:        fixturePath("fileA.json"),
+			pathB:        fixturePath("fileB.json"),
+			expectedPath: fixturePath("expectedAB.diff"),
 		},
 		{
 			name:         "AC",
-			pathA:        fileA,
-			pathB:        fileC,
-			expectedPath: expectedAC,
+			pathA:        fixturePath("fileA.json"),
+			pathB:        fixturePath("fileC.json"),
+			expectedPath: fixturePath("expectedAC.diff"),
 		},
 		{
 			name:         "CD",
-			pathA:        fileC,
-			pathB:        fileD,
-			expectedPath: expectedCD,
+			pathA:        fixturePath("fileC.json"),
+			pathB:        fixturePath("fileD.json"),
+			expectedPath: fixturePath("expectedCD.diff"),
 		},
 		{
 			name:         "AA json vs yaml",
-			pathA:        fileA,
-			pathB:        fileAYaml,
-			expectedPath: expectedAA,
+			pathA:        fixturePath("fileA.json"),
+			pathB:        fixturePath("fileA.yml"),
+			expectedPath: fixturePath("expectedAA.diff"),
 		},
 		{
 			name:         "AA yaml vs json",
-			pathA:        fileAYaml,
-			pathB:        fileA,
-			expectedPath: expectedAA,
+			pathA:        fixturePath("fileA.yml"),
+			pathB:        fixturePath("fileA.json"),
+			expectedPath: fixturePath("expectedAA.diff"),
 		},
 		{
 			name:         "AB yaml",
-			pathA:        fileAYaml,
-			pathB:        fileBYaml,
-			expectedPath: expectedAB,
+			pathA:        fixturePath("fileA.yml"),
+			pathB:        fixturePath("fileB.yml"),
+			expectedPath: fixturePath("expectedAB.diff"),
 		},
 		{
 			name:         "nested json files",
-			pathA:        fileE,
-			pathB:        fileF,
-			expectedPath: expectedEF,
+			pathA:        fixturePath("fileE.json"),
+			pathB:        fixturePath("fileF.json"),
+			expectedPath: fixturePath("expectedEF.diff"),
 		},
 	}
 
@@ -103,9 +92,10 @@ func TestGendiffFlat(t *testing.T) {
 			dataA := parseFile(t, tt.pathA)
 			dataB := parseFile(t, tt.pathB)
 
-			diff := strings.TrimSpace(code.GenDiff(dataA, dataB))
+			diff := code.GenDiff(dataA, dataB)
+			actual := strings.TrimSpace(formatters.PrintDiff(diff, "stylish"))
 			expected := readFileToString(t, tt.expectedPath)
-			assert.Equal(t, expected, diff, "diff mismatch for case %s", tt.name)
+			assert.Equal(t, expected, actual, "diff mismatch for case %s", tt.name)
 		})
 	}
 }

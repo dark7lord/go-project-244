@@ -1,0 +1,3 @@
+Property 'key5' was added with value: 'added value'
+Property 'key6' was removed
+Property 'key7' was updated. From 'old value' to 'new value'
