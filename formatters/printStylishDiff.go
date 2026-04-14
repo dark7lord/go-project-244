@@ -6,13 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	dff "code/diff"
-)
-
-const (
-	diffTypeAdded   = "added"
-	diffTypeRemoved = "removed"
-	diffTypeChanged = "changed"
+	"code/diff"
 )
 
 func isMap(diff any) bool {
@@ -20,13 +14,13 @@ func isMap(diff any) bool {
 	return isMap
 }
 
-func printStylishDiff(diff any, deep int) string {
-	if !isMap(diff) {
-		if diff == nil {
+func printStylishDiff(difference any, deep int) string {
+	if !isMap(difference) {
+		if difference == nil {
 			return "null"
 		}
 
-		return fmt.Sprintf("%v", diff)
+		return fmt.Sprintf("%v", difference)
 	}
 
 	var builder strings.Builder
@@ -50,13 +44,13 @@ func printStylishDiff(diff any, deep int) string {
 
 	pad := strings.Repeat("  ", deep)
 
-	switch v := diff.(type) {
+	switch v := difference.(type) {
 	case map[string]any:
 		keys := slices.Collect(maps.Keys(v))
 		slices.Sort(keys)
 		builder.WriteString("{\n")
 		for _, key := range keys {
-			d, isDiff := v[key].(dff.Diff)
+			d, isDiff := v[key].(diff.Diff)
 
 			if !isDiff {
 				writeValue(" ", key, v[key], deep+1)
@@ -64,13 +58,13 @@ func printStylishDiff(diff any, deep int) string {
 			}
 
 			switch d.TypeDiff {
-			case "unchanged":
+			case diff.DiffTypeUnchanged:
 				writeValue(" ", key, d.OldValue, deep+1)
-			case diffTypeAdded:
+			case diff.DiffTypeAdded:
 				writeValue("+", key, d.NewValue, deep+1)
-			case diffTypeRemoved:
+			case diff.DiffTypeRemoved:
 				writeValue("-", key, d.OldValue, deep+1)
-			case diffTypeChanged:
+			case diff.DiffTypeChanged:
 				writeValue("-", key, d.OldValue, deep+1)
 				writeValue("+", key, d.NewValue, deep+1)
 			}

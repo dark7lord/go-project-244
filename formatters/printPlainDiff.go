@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	dff "code/diff"
+	"code/diff"
 )
 
 func formatValue(value any) string {
@@ -22,17 +22,17 @@ func formatValue(value any) string {
 	}
 }
 
-func printPlainDiff(diff any, keys []string) string {
-	switch v := diff.(type) {
-	case dff.Diff:
+func printPlainDiff(difference any, keys []string) string {
+	switch v := difference.(type) {
+	case diff.Diff:
 		strPath := strings.Join(keys, ".")
 		switch v.TypeDiff {
-		case "added":
+		case diff.DiffTypeAdded:
 			strValue := formatValue(v.NewValue)
 			return fmt.Sprintf("Property '%s' was added with value: %s", strPath, strValue)
-		case "removed":
+		case diff.DiffTypeRemoved:
 			return fmt.Sprintf("Property '%s' was removed", strPath)
-		case "changed":
+		case diff.DiffTypeChanged:
 			strOldValue := formatValue(v.OldValue)
 			strNewValue := formatValue(v.NewValue)
 			return fmt.Sprintf("Property '%s' was updated. From %s to %s", strPath, strOldValue, strNewValue)

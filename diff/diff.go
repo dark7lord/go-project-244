@@ -7,3 +7,11 @@ type Diff struct {
 	OldValue any
 	NewValue any
 }
+
+// DiffTypes constants for all states Diff
+const (
+	DiffTypeAdded     = "added"
+	DiffTypeRemoved   = "removed"
+	DiffTypeChanged   = "changed"
+	DiffTypeUnchanged = "unchanged"
+)
