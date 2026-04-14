@@ -45,7 +45,7 @@ func Run() error {
 				return err
 			}
 
-			fmt.Println(diff)
+			fmt.Print(diff)
 
 			return nil
 		},
