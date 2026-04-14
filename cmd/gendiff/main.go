@@ -35,7 +35,7 @@ func Run() error {
 			}
 
 			format := cmd.String("format")
-			if format != "stylish" && format != "plain" {
+			if format != "stylish" && format != "plain" && format != "json" {
 				return fmt.Errorf("unsupported format: %s", format)
 			}
 

@@ -3,6 +3,11 @@ package code
 
 const (
 	unknownType = "unknown type"
+
+	DiffTypeUnchanged = "unchanged"
+	DiffTypeAdded     = "added"
+	DiffTypeRemoved   = "removed"
+	DiffTypeChanged   = "changed"
 )
 
 func typeVar(value any) string {
@@ -54,19 +59,29 @@ func normalizeValue(value any) any {
 	}
 }
 
+// IsPrimitive function checks if the value is a primitive type (string, number, boolean, or null)
+func IsPrimitive(value any) bool {
+	switch value.(type) {
+	case string, int, int64, float64, bool, nil:
+		return true
+	default:
+		return false
+	}
+}
+
 func genMapDiff(mapA, mapB map[string]any) map[string]any {
 	diffs := map[string]any{}
 	for key, valueA := range mapA {
 		normA := normalizeValue(valueA)
 		diff := Diff{
-			TypeDiff: "unchanged",
-			OldValue: normA,
+			TypeDiff: DiffTypeUnchanged,
+			OldValue: valueA,
 		}
 
 		valueB, ok := mapB[key]
 
 		if !ok {
-			diff.TypeDiff = "removed"
+			diff.TypeDiff = DiffTypeRemoved
 			diffs[key] = diff
 
 			continue
@@ -75,7 +90,7 @@ func genMapDiff(mapA, mapB map[string]any) map[string]any {
 		normB := normalizeValue(valueB)
 
 		if (IsPrimitive(normA) || IsPrimitive(normB)) && !isEqual(normA, normB) {
-			diff.TypeDiff = "changed"
+			diff.TypeDiff = DiffTypeChanged
 			diff.NewValue = valueB
 			diffs[key] = diff
 
@@ -95,7 +110,7 @@ func genMapDiff(mapA, mapB map[string]any) map[string]any {
 	for key, valueB := range mapB {
 		if _, ok := mapA[key]; !ok {
 			diffs[key] = Diff{
-				TypeDiff: "added",
+				TypeDiff: DiffTypeAdded,
 				NewValue: valueB,
 			}
 		}
@@ -105,20 +120,10 @@ func genMapDiff(mapA, mapB map[string]any) map[string]any {
 }
 
 // GenDiff function returns the difference between two structures as a string
-func GenDiff(dataA, dataB any) any {
+func GenDiff(dataA, dataB any) map[string]any {
 	mapA := dataA.(map[string]any)
 	mapB := dataB.(map[string]any)
 	diff := genMapDiff(mapA, mapB)
 
 	return diff
-}
-
-// IsPrimitive function checks if the value is a primitive type (string, number, boolean, or null)
-func IsPrimitive(value any) bool {
-	switch value.(type) {
-	case string, int, int64, float64, bool, nil:
-		return true
-	default:
-		return false
-	}
 }

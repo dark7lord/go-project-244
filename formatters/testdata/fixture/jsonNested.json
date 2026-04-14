@@ -1,0 +1,22 @@
+{
+  "key1": "string value 1",
+  "key2": 42,
+  "key3": false,
+  "key4": null,
+  "key5": {
+    "nestedKey": "nestedValue",
+    "nestedKey2": {
+      "NewValue": "added nested value",
+      "TypeDiff": "added"
+    }
+  },
+  "key6": {
+    "OldValue": "deleted value",
+    "TypeDiff": "removed"
+  },
+  "key7": {
+    "NewValue": "new value",
+    "OldValue": "old value",
+    "TypeDiff": "changed"
+  }
+}

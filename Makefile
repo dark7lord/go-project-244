@@ -19,4 +19,4 @@ cover:
 # 	go tool cover -html=coverage.out
 
 
-.PHONY: test fmt lint-fix lint build run
+.PHONY: test fmt lint-fix lint build cover

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
 
 	"code"
@@ -49,20 +50,20 @@ func TestPrintDiff(t *testing.T) {
 				"key4": nil,
 				"key5": true,
 				"key6": code.Diff{
-					TypeDiff: "added",
+					TypeDiff: code.DiffTypeAdded,
 					NewValue: "added value",
 				},
 				"key7": code.Diff{
-					TypeDiff: "removed",
+					TypeDiff: code.DiffTypeRemoved,
 					OldValue: "removed value",
 				},
 				"key8": code.Diff{
-					TypeDiff: "unchanged",
+					TypeDiff: code.DiffTypeUnchanged,
 					OldValue: "unchanged value",
 					NewValue: "unchanged value",
 				},
 				"key9": code.Diff{
-					TypeDiff: "changed",
+					TypeDiff: code.DiffTypeChanged,
 					OldValue: "old value",
 					NewValue: "new value",
 				},
@@ -78,19 +79,19 @@ func TestPrintDiff(t *testing.T) {
 					"nestedKey": "nestedValue",
 				},
 				"key3": code.Diff{
-					TypeDiff: "added",
+					TypeDiff: code.DiffTypeAdded,
 					NewValue: map[string]any{
 						"addedNestedKey": "addedNestedValue",
 					},
 				},
 				"key4": code.Diff{
-					TypeDiff: "removed",
+					TypeDiff: code.DiffTypeRemoved,
 					OldValue: map[string]any{
 						"removedNestedKey": "removedNestedValue",
 					},
 				},
 				"key5": code.Diff{
-					TypeDiff: "changed",
+					TypeDiff: code.DiffTypeChanged,
 					OldValue: map[string]any{
 						"oldNestedKey": "oldNestedValue",
 					},
@@ -99,7 +100,7 @@ func TestPrintDiff(t *testing.T) {
 					},
 				},
 				"key6": code.Diff{
-					TypeDiff: "unchanged",
+					TypeDiff: code.DiffTypeUnchanged,
 					OldValue: map[string]any{
 						"unchangedNestedKey": "unchangedNestedValue",
 					},
@@ -119,20 +120,20 @@ func TestPrintDiff(t *testing.T) {
 				"key3": nil,
 				"key4": true,
 				"key5": code.Diff{
-					TypeDiff: "added",
+					TypeDiff: code.DiffTypeAdded,
 					NewValue: "added value",
 				},
 				"key6": code.Diff{
-					TypeDiff: "removed",
+					TypeDiff: code.DiffTypeRemoved,
 					OldValue: "removed value",
 				},
 				"key7": code.Diff{
-					TypeDiff: "changed",
+					TypeDiff: code.DiffTypeChanged,
 					OldValue: "old value",
 					NewValue: "new value",
 				},
 				"key8": code.Diff{
-					TypeDiff: "unchanged",
+					TypeDiff: code.DiffTypeUnchanged,
 					OldValue: "unchanged value",
 					NewValue: "unchanged value",
 				},
@@ -147,28 +148,55 @@ func TestPrintDiff(t *testing.T) {
 				"key2": map[string]any{
 					"nestedKey": "nestedValue",
 					"nestedKey2": code.Diff{
-						TypeDiff: "added",
+						TypeDiff: code.DiffTypeAdded,
 						NewValue: "addedNestedValue",
 					},
 					"nestedKey3": code.Diff{
-						TypeDiff: "removed",
+						TypeDiff: code.DiffTypeRemoved,
 						OldValue: "removedNestedValue",
 					},
 					"nestedKey4": map[string]any{
 						"deepNestedKey": code.Diff{
-							TypeDiff: "changed",
+							TypeDiff: code.DiffTypeChanged,
 							OldValue: "oldDeepNestedValue",
 							NewValue: "newDeepNestedValue",
 						},
 					},
 					"nestedKey5": code.Diff{
-						TypeDiff: "unchanged",
+						TypeDiff: code.DiffTypeUnchanged,
 						OldValue: "unchangedNestedValue",
 					},
 				},
 			},
 			format: "plain",
 			path:   filepath.Join("testdata", "fixture", "plainNested.txt"),
+		},
+		{
+			name: "json format",
+			diff: map[string]any{
+				"key1": "string value 1",
+				"key2": 42,
+				"key3": false,
+				"key4": nil,
+				"key5": map[string]any{
+					"nestedKey": "nestedValue",
+					"nestedKey2": code.Diff{
+						TypeDiff: code.DiffTypeAdded,
+						NewValue: "added nested value",
+					},
+				},
+				"key6": code.Diff{
+					TypeDiff: code.DiffTypeRemoved,
+					OldValue: "deleted value",
+				},
+				"key7": code.Diff{
+					TypeDiff: code.DiffTypeChanged,
+					OldValue: "old value",
+					NewValue: "new value",
+				},
+			},
+			format: "json",
+			path:   filepath.Join("testdata", "fixture", "jsonNested.json"),
 		},
 	}
 
@@ -180,7 +208,9 @@ func TestPrintDiff(t *testing.T) {
 			if tt.path != "" {
 				expected := readFileToString(t, tt.path)
 				if actual != expected {
-					t.Errorf("PrintDiff() = %v, want %v", actual, expected)
+					diff := cmp.Diff(expected, actual)
+					t.Errorf("PrintDiff() mismatch (-want +got):\n%s", diff)
+					// t.Errorf("PrintDiff() = %v, want %v", actual, expected)
 				}
 			} else if actual != tt.want {
 				t.Errorf("PrintDiff() = %v, want %v", actual, tt.want)
