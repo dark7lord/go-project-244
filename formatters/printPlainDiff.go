@@ -40,27 +40,16 @@ func printPlainDiff(diff any, keys []string) string {
 			return printPlainDiff(v.OldValue, keys) // for nested diffs
 		}
 	case map[string]any:
-		var builder strings.Builder
-
-		mapKeys := slices.Collect(maps.Keys(v))
-		slices.Sort(mapKeys)
-
-		for i, mk := range mapKeys {
+		var lines []string
+		mapKeys := slices.Sorted(maps.Keys(v))
+		for _, mk := range mapKeys {
 			newPath := append(slices.Clone(keys), mk)
-			line := printPlainDiff(v[mk], newPath)
-
-			if line == "" {
-				continue
-			}
-
-			builder.WriteString(line)
-
-			if i != len(mapKeys)-1 {
-				builder.WriteString("\n")
+			if line := printPlainDiff(v[mk], newPath); line != "" {
+				lines = append(lines, line)
 			}
 		}
 
-		return builder.String()
+		return strings.Join(lines, "\n")
 	default:
 		return ""
 	}
