@@ -1,6 +1,7 @@
 // Package code provides functions for getting the difference between files
 package code
 
+// Types of differences between two files.
 const (
 	unknownType = "unknown type"
 
