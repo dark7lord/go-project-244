@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	"code"
+	dff "code/diff"
 )
 
 const (
@@ -15,8 +15,13 @@ const (
 	diffTypeChanged = "changed"
 )
 
+func isMap(diff any) bool {
+	_, isMap := diff.(map[string]any)
+	return isMap
+}
+
 func printStylishDiff(diff any, deep int) string {
-	if code.IsPrimitive(diff) {
+	if !isMap(diff) {
 		if diff == nil {
 			return "null"
 		}
@@ -30,7 +35,7 @@ func printStylishDiff(diff any, deep int) string {
 		pad := strings.Repeat("  ", deep)
 		nl := ""
 
-		if code.IsPrimitive(value) {
+		if !isMap(value) {
 			nl = "\n"
 		}
 
@@ -51,7 +56,7 @@ func printStylishDiff(diff any, deep int) string {
 		slices.Sort(keys)
 		builder.WriteString("{\n")
 		for _, key := range keys {
-			d, isDiff := v[key].(code.Diff)
+			d, isDiff := v[key].(dff.Diff)
 
 			if !isDiff {
 				writeValue(" ", key, v[key], deep+1)

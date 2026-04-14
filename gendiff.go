@@ -1,6 +1,12 @@
 // Package code provides functions for getting the difference between files
 package code
 
+import (
+	"code/diff"
+	"code/formatters"
+	"code/parsers"
+)
+
 // Types of differences between two files.
 const (
 	unknownType = "unknown type"
@@ -43,13 +49,6 @@ func isEqual(a, b any) bool {
 	return a == b
 }
 
-// Diff struct represents the difference between two values
-type Diff struct {
-	TypeDiff string
-	OldValue any
-	NewValue any
-}
-
 // yaml parser return int instead of float64
 func normalizeValue(value any) any {
 	switch v := value.(type) {
@@ -74,7 +73,7 @@ func genMapDiff(mapA, mapB map[string]any) map[string]any {
 	diffs := map[string]any{}
 	for key, valueA := range mapA {
 		normA := normalizeValue(valueA)
-		diff := Diff{
+		diff := diff.Diff{
 			TypeDiff: DiffTypeUnchanged,
 			OldValue: valueA,
 		}
@@ -110,7 +109,7 @@ func genMapDiff(mapA, mapB map[string]any) map[string]any {
 
 	for key, valueB := range mapB {
 		if _, ok := mapA[key]; !ok {
-			diffs[key] = Diff{
+			diffs[key] = diff.Diff{
 				TypeDiff: DiffTypeAdded,
 				NewValue: valueB,
 			}
@@ -121,10 +120,21 @@ func genMapDiff(mapA, mapB map[string]any) map[string]any {
 }
 
 // GenDiff function returns the difference between two structures as a string
-func GenDiff(dataA, dataB any) map[string]any {
+func GenDiff(pathA, pathB, format string) (string, error) {
+	dataA, err := parsers.Parse(pathA)
+	if err != nil {
+		return "", err
+	}
+
+	dataB, err := parsers.Parse(pathB)
+	if err != nil {
+		return "", err
+	}
+
 	mapA := dataA.(map[string]any)
 	mapB := dataB.(map[string]any)
 	diff := genMapDiff(mapA, mapB)
+	result := formatters.PrintDiff(diff, format)
 
-	return diff
+	return result, nil
 }

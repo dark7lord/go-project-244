@@ -11,8 +11,6 @@ import (
 	"github.com/urfave/cli/v3"
 
 	"code"
-	"code/formatters"
-	"code/parsers"
 )
 
 func Run() error {
@@ -39,23 +37,15 @@ func Run() error {
 				return fmt.Errorf("unsupported format: %s", format)
 			}
 
-			filepath1 := cmd.Args().Get(0)
-			filepath2 := cmd.Args().Get(1)
+			filepathA := cmd.Args().Get(0)
+			filepathB := cmd.Args().Get(1)
 
-			filedata1, err1 := parsers.Parse(filepath1)
-			filedata2, err2 := parsers.Parse(filepath2)
-
-			if err1 != nil {
-				return err1
+			diff, err := code.GenDiff(filepathA, filepathB, format)
+			if err != nil {
+				return err
 			}
 
-			if err2 != nil {
-				return err2
-			}
-
-			diff := code.GenDiff(filedata1, filedata2)
-			result := formatters.PrintDiff(diff, format)
-			fmt.Println(result)
+			fmt.Println(diff)
 
 			return nil
 		},

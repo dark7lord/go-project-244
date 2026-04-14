@@ -9,7 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
 
-	"code"
+	"code/diff"
 )
 
 func readFileToString(t *testing.T, path string) string {
@@ -49,21 +49,21 @@ func TestPrintDiff(t *testing.T) {
 				"key3": "",
 				"key4": nil,
 				"key5": true,
-				"key6": code.Diff{
-					TypeDiff: code.DiffTypeAdded,
+				"key6": diff.Diff{
+					TypeDiff: "added",
 					NewValue: "added value",
 				},
-				"key7": code.Diff{
-					TypeDiff: code.DiffTypeRemoved,
+				"key7": diff.Diff{
+					TypeDiff: "removed",
 					OldValue: "removed value",
 				},
-				"key8": code.Diff{
-					TypeDiff: code.DiffTypeUnchanged,
+				"key8": diff.Diff{
+					TypeDiff: "unchanged",
 					OldValue: "unchanged value",
 					NewValue: "unchanged value",
 				},
-				"key9": code.Diff{
-					TypeDiff: code.DiffTypeChanged,
+				"key9": diff.Diff{
+					TypeDiff: "changed",
 					OldValue: "old value",
 					NewValue: "new value",
 				},
@@ -78,20 +78,20 @@ func TestPrintDiff(t *testing.T) {
 				"key2": map[string]any{
 					"nestedKey": "nestedValue",
 				},
-				"key3": code.Diff{
-					TypeDiff: code.DiffTypeAdded,
+				"key3": diff.Diff{
+					TypeDiff: "added",
 					NewValue: map[string]any{
 						"addedNestedKey": "addedNestedValue",
 					},
 				},
-				"key4": code.Diff{
-					TypeDiff: code.DiffTypeRemoved,
+				"key4": diff.Diff{
+					TypeDiff: "removed",
 					OldValue: map[string]any{
 						"removedNestedKey": "removedNestedValue",
 					},
 				},
-				"key5": code.Diff{
-					TypeDiff: code.DiffTypeChanged,
+				"key5": diff.Diff{
+					TypeDiff: "changed",
 					OldValue: map[string]any{
 						"oldNestedKey": "oldNestedValue",
 					},
@@ -99,8 +99,8 @@ func TestPrintDiff(t *testing.T) {
 						"newNestedKey": "newNestedValue",
 					},
 				},
-				"key6": code.Diff{
-					TypeDiff: code.DiffTypeUnchanged,
+				"key6": diff.Diff{
+					TypeDiff: "unchanged",
 					OldValue: map[string]any{
 						"unchangedNestedKey": "unchangedNestedValue",
 					},
@@ -119,21 +119,21 @@ func TestPrintDiff(t *testing.T) {
 				"key2": 42,
 				"key3": nil,
 				"key4": true,
-				"key5": code.Diff{
-					TypeDiff: code.DiffTypeAdded,
+				"key5": diff.Diff{
+					TypeDiff: "added",
 					NewValue: "added value",
 				},
-				"key6": code.Diff{
-					TypeDiff: code.DiffTypeRemoved,
+				"key6": diff.Diff{
+					TypeDiff: "removed",
 					OldValue: "removed value",
 				},
-				"key7": code.Diff{
-					TypeDiff: code.DiffTypeChanged,
+				"key7": diff.Diff{
+					TypeDiff: "changed",
 					OldValue: "old value",
 					NewValue: "new value",
 				},
-				"key8": code.Diff{
-					TypeDiff: code.DiffTypeUnchanged,
+				"key8": diff.Diff{
+					TypeDiff: "unchanged",
 					OldValue: "unchanged value",
 					NewValue: "unchanged value",
 				},
@@ -147,23 +147,23 @@ func TestPrintDiff(t *testing.T) {
 				"key1": "value1",
 				"key2": map[string]any{
 					"nestedKey": "nestedValue",
-					"nestedKey2": code.Diff{
-						TypeDiff: code.DiffTypeAdded,
+					"nestedKey2": diff.Diff{
+						TypeDiff: "added",
 						NewValue: "addedNestedValue",
 					},
-					"nestedKey3": code.Diff{
-						TypeDiff: code.DiffTypeRemoved,
+					"nestedKey3": diff.Diff{
+						TypeDiff: "removed",
 						OldValue: "removedNestedValue",
 					},
 					"nestedKey4": map[string]any{
-						"deepNestedKey": code.Diff{
-							TypeDiff: code.DiffTypeChanged,
+						"deepNestedKey": diff.Diff{
+							TypeDiff: "changed",
 							OldValue: "oldDeepNestedValue",
 							NewValue: "newDeepNestedValue",
 						},
 					},
-					"nestedKey5": code.Diff{
-						TypeDiff: code.DiffTypeUnchanged,
+					"nestedKey5": diff.Diff{
+						TypeDiff: "unchanged",
 						OldValue: "unchangedNestedValue",
 					},
 				},
@@ -180,17 +180,17 @@ func TestPrintDiff(t *testing.T) {
 				"key4": nil,
 				"key5": map[string]any{
 					"nestedKey": "nestedValue",
-					"nestedKey2": code.Diff{
-						TypeDiff: code.DiffTypeAdded,
+					"nestedKey2": diff.Diff{
+						TypeDiff: "added",
 						NewValue: "added nested value",
 					},
 				},
-				"key6": code.Diff{
-					TypeDiff: code.DiffTypeRemoved,
+				"key6": diff.Diff{
+					TypeDiff: "removed",
 					OldValue: "deleted value",
 				},
-				"key7": code.Diff{
-					TypeDiff: code.DiffTypeChanged,
+				"key7": diff.Diff{
+					TypeDiff: "changed",
 					OldValue: "old value",
 					NewValue: "new value",
 				},

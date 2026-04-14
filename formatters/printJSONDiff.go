@@ -3,25 +3,25 @@ package formatters
 import (
 	"encoding/json"
 
-	"code"
+	dff "code/diff"
 )
 
 func cleanDiff(diff any) any {
 	switch d := diff.(type) {
-	case code.Diff:
+	case dff.Diff:
 		result := map[string]any{
 			"TypeDiff": d.TypeDiff,
 		}
 
 		switch d.TypeDiff {
-		case code.DiffTypeAdded:
+		case "added":
 			result["NewValue"] = d.NewValue
-		case code.DiffTypeRemoved:
+		case "removed":
 			result["OldValue"] = d.OldValue
-		case code.DiffTypeChanged:
+		case "changed":
 			result["OldValue"] = d.OldValue
 			result["NewValue"] = d.NewValue
-		case code.DiffTypeUnchanged:
+		case "unchanged":
 			return cleanDiff(d.OldValue)
 		}
 

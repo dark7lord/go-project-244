@@ -1,4 +1,4 @@
-package parsers_test
+package parsers
 
 import (
 	"errors"
@@ -8,8 +8,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"code/parsers"
 )
 
 var fixtureDir = filepath.Join("..", "testdata", "fixture")
@@ -70,7 +68,7 @@ func TestParse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := parsers.Parse(tt.path)
+			result, err := Parse(tt.path)
 
 			if tt.wantErr {
 				require.Error(t, err)
@@ -103,7 +101,7 @@ func TestParsePermissionDenied(t *testing.T) {
 		t.Skip("chmod not supported on this platform")
 	}
 
-	_, err = parsers.Parse(path)
+	_, err = Parse(path)
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, os.ErrPermission))
 }

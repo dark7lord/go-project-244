@@ -1,4 +1,4 @@
-package code_test
+package code
 
 import (
 	"os"
@@ -8,10 +8,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"code"
-	"code/formatters"
-	"code/parsers"
 )
 
 func readFileToString(t *testing.T, path string) string {
@@ -21,15 +17,6 @@ func readFileToString(t *testing.T, path string) string {
 	require.NoError(t, err, "failed to read file %s", path)
 
 	return strings.TrimSpace(string(data))
-}
-
-func parseFile(t *testing.T, path string) any {
-	t.Helper()
-
-	data, err := parsers.Parse(path)
-	require.NoError(t, err, "failed to parse file %s", path)
-
-	return data
 }
 
 func fixturePath(name string) string {
@@ -89,12 +76,10 @@ func TestGendiff(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			dataA := parseFile(t, tt.pathA)
-			dataB := parseFile(t, tt.pathB)
-
-			diff := code.GenDiff(dataA, dataB)
-			actual := strings.TrimSpace(formatters.PrintDiff(diff, "stylish"))
+			result, _ := GenDiff(tt.pathA, tt.pathB, "stylish")
+			actual := strings.TrimSpace(result)
 			expected := readFileToString(t, tt.expectedPath)
+
 			assert.Equal(t, expected, actual, "diff mismatch for case %s", tt.name)
 		})
 	}
