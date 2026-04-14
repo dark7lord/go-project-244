@@ -77,7 +77,10 @@ func printStylishDiff(diff any, deep int) string {
 		}
 
 		builder.WriteString(pad)
-		builder.WriteString("}\n")
+		builder.WriteString("}")
+		if deep != 0 {
+			builder.WriteString("\n")
+		}
 
 	case []any:
 		if len(v) == 0 {
