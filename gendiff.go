@@ -10,16 +10,12 @@ import (
 // Types of differences between two files.
 const (
 	unknownType = "unknown type"
-
-	DiffTypeUnchanged = "unchanged"
-	DiffTypeAdded     = "added"
-	DiffTypeRemoved   = "removed"
-	DiffTypeChanged   = "changed"
+	arr         = "arr"
 )
 
 func typeVar(value any) string {
 	switch value.(type) {
-	case float64:
+	case float64, int:
 		return "num"
 	case string:
 		return "string"
@@ -29,6 +25,8 @@ func typeVar(value any) string {
 		return "null"
 	case map[string]any:
 		return "map"
+	case []any:
+		return arr
 	default:
 		return unknownType
 	}
@@ -40,6 +38,23 @@ func isEqual(a, b any) bool {
 
 	if typeA == unknownType || typeB == unknownType {
 		return false
+	}
+
+	if typeA == arr && typeB == arr {
+		sliceA := a.([]any)
+		sliceB := b.([]any)
+
+		if len(sliceA) != len(typeB) {
+			return false
+		}
+
+		for i := range sliceA {
+			if !isEqual(sliceA[i], sliceB[i]) {
+				return false
+			}
+		}
+
+		return true
 	}
 
 	if typeA != typeB {
@@ -59,64 +74,110 @@ func normalizeValue(value any) any {
 	}
 }
 
-// IsPrimitive function checks if the value is a primitive type (string, number, boolean, or null)
-func IsPrimitive(value any) bool {
-	switch value.(type) {
-	case string, int, int64, float64, bool, nil:
-		return true
-	default:
-		return false
-	}
-}
-
 func genMapDiff(mapA, mapB map[string]any) map[string]any {
 	diffs := map[string]any{}
 	for key, valueA := range mapA {
-		normA := normalizeValue(valueA)
-		diff := diff.Diff{
-			TypeDiff: DiffTypeUnchanged,
-			OldValue: valueA,
-		}
-
 		valueB, ok := mapB[key]
 
 		if !ok {
-			diff.TypeDiff = DiffTypeRemoved
-			diffs[key] = diff
+			difference := BuildDiff(diff.Removed, valueA, nil)
+			difference.Key = key
+			diffs[key] = difference
 
 			continue
 		}
 
-		normB := normalizeValue(valueB)
-
-		if (IsPrimitive(normA) || IsPrimitive(normB)) && !isEqual(normA, normB) {
-			diff.TypeDiff = DiffTypeChanged
-			diff.NewValue = valueB
-			diffs[key] = diff
-
-			continue
-		}
-
-		leftValue, isLeftMap := valueA.(map[string]any)
-		rightValue, isRightMap := valueB.(map[string]any)
-
-		if isLeftMap && isRightMap {
-			diff.OldValue = genMapDiff(leftValue, rightValue)
-		}
-
-		diffs[key] = diff
+		diffs[key] = recursiveGendiff(valueA, valueB)
 	}
 
 	for key, valueB := range mapB {
 		if _, ok := mapA[key]; !ok {
 			diffs[key] = diff.Diff{
-				TypeDiff: DiffTypeAdded,
+				Key:      key,
+				TypeDiff: diff.Added,
 				NewValue: valueB,
 			}
 		}
 	}
 
 	return diffs
+}
+
+func genSliceDiff(sliceA, sliceB []any) []any {
+	result := []any{}
+	lenA := len(sliceA)
+	lenB := len(sliceB)
+
+	for i, itemA := range sliceA {
+		if i < lenB {
+			itemB := sliceB[i]
+			diff := recursiveGendiff(itemA, itemB)
+			result = append(result, diff)
+		}
+	}
+
+	if lenA > lenB {
+		for _, itemA := range sliceA[lenB:] {
+			d := BuildDiff(diff.Removed, itemA, nil)
+			result = append(result, d)
+		}
+	}
+
+	if lenB > lenA {
+		for _, itemB := range sliceB[lenA:] {
+			d := BuildDiff(diff.Added, nil, itemB)
+			result = append(result, d)
+		}
+	}
+
+	return result
+}
+
+// BuildDiff function builds a Diff struct based on the type of difference and the old and new values
+func BuildDiff(typeDiff diff.Kind, oldValue, newValue any) diff.Diff {
+	result := diff.Diff{
+		TypeDiff: typeDiff,
+		OldValue: normalizeValue(oldValue),
+	}
+
+	if typeDiff == diff.Added {
+		result.OldValue = nil
+	}
+
+	if typeDiff == diff.Added || typeDiff == diff.Changed {
+		result.NewValue = normalizeValue(newValue)
+	}
+
+	return result
+}
+
+func recursiveGendiff(dataA, dataB any) any {
+	mapA, isAMap := dataA.(map[string]any)
+	mapB, isBmap := dataB.(map[string]any)
+
+	if isAMap && isBmap {
+		return genMapDiff(mapA, mapB)
+	}
+
+	sliceA, isASlice := dataA.([]any)
+	sliceB, isBSlice := dataB.([]any)
+
+	if isASlice && isBSlice {
+		return genSliceDiff(sliceA, sliceB)
+	}
+
+	typeDiff := diff.Unchanged
+	typeA := typeVar(dataA)
+	typeB := typeVar(dataB)
+
+	normA := normalizeValue(dataA)
+	normB := normalizeValue(dataB)
+
+	if typeA != typeB || !isEqual(normA, normB) {
+		typeDiff = diff.Changed
+	}
+
+	return BuildDiff(typeDiff, normA, normB)
 }
 
 // GenDiff function returns the difference between two structures as a string
@@ -131,10 +192,12 @@ func GenDiff(pathA, pathB, format string) (string, error) {
 		return "", err
 	}
 
-	mapA := dataA.(map[string]any)
-	mapB := dataB.(map[string]any)
-	diff := genMapDiff(mapA, mapB)
-	result := formatters.PrintDiff(diff, format)
+	diff := recursiveGendiff(dataA, dataB)
+	typedFormat := formatters.PrintFormat(format)
+	result, err := formatters.PrintDiff(diff, typedFormat)
+	if err != nil {
+		return "", err
+	}
 
 	return result, nil
 }

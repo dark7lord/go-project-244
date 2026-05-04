@@ -3,7 +3,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -11,6 +10,7 @@ import (
 	"github.com/urfave/cli/v3"
 
 	"code"
+	"code/formatters"
 )
 
 func Run() error {
@@ -28,12 +28,12 @@ func Run() error {
 			},
 		},
 		Action: func(_ context.Context, cmd *cli.Command) error {
-			if cmd.NArg() != 2 {
-				return errors.New("wrong number of args file paths")
+			if argsCount := cmd.NArg(); argsCount != 2 {
+				return fmt.Errorf("expected 2 file paths, got %d", argsCount)
 			}
 
 			format := cmd.String("format")
-			if format != "stylish" && format != "plain" && format != "json" {
+			if !formatters.IsValidFormat(format) {
 				return fmt.Errorf("unsupported format: %s", format)
 			}
 

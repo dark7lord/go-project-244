@@ -9,13 +9,14 @@ import (
 	"code/diff"
 )
 
-func isMap(diff any) bool {
+func isComplex(diff any) bool {
 	_, isMap := diff.(map[string]any)
-	return isMap
+	_, isSlice := diff.([]any)
+	return isMap || isSlice
 }
 
 func printStylishDiff(difference any, deep int) string {
-	if !isMap(difference) {
+	if !isComplex(difference) {
 		if difference == nil {
 			return "null"
 		}
@@ -29,7 +30,7 @@ func printStylishDiff(difference any, deep int) string {
 		pad := strings.Repeat("  ", deep)
 		nl := ""
 
-		if !isMap(value) {
+		if !isComplex(value) {
 			nl = "\n"
 		}
 
@@ -37,9 +38,24 @@ func printStylishDiff(difference any, deep int) string {
 
 		if key == "" {
 			fmt.Fprintf(&builder, "%s%s %s%s", pad, prefix, strValue, nl)
+			return
 		}
 
 		fmt.Fprintf(&builder, "%s%s %s: %s%s", pad, prefix, key, strValue, nl)
+	}
+
+	printDiff := func(d diff.Diff, key string, deep int) {
+		switch d.TypeDiff {
+		case diff.Unchanged:
+			writeValue(" ", key, d.OldValue, deep)
+		case diff.Added:
+			writeValue("+", key, d.NewValue, deep)
+		case diff.Removed:
+			writeValue("-", key, d.OldValue, deep)
+		case diff.Changed:
+			writeValue("-", key, d.OldValue, deep)
+			writeValue("+", key, d.NewValue, deep)
+		}
 	}
 
 	pad := strings.Repeat("  ", deep)
@@ -52,22 +68,12 @@ func printStylishDiff(difference any, deep int) string {
 		for _, key := range keys {
 			d, isDiff := v[key].(diff.Diff)
 
-			if !isDiff {
-				writeValue(" ", key, v[key], deep+1)
+			if isDiff {
+				printDiff(d, key, deep+1)
 				continue
 			}
 
-			switch d.TypeDiff {
-			case diff.DiffTypeUnchanged:
-				writeValue(" ", key, d.OldValue, deep+1)
-			case diff.DiffTypeAdded:
-				writeValue("+", key, d.NewValue, deep+1)
-			case diff.DiffTypeRemoved:
-				writeValue("-", key, d.OldValue, deep+1)
-			case diff.DiffTypeChanged:
-				writeValue("-", key, d.OldValue, deep+1)
-				writeValue("+", key, d.NewValue, deep+1)
-			}
+			writeValue(" ", key, v[key], deep+1)
 		}
 
 		builder.WriteString(pad)
@@ -79,14 +85,24 @@ func printStylishDiff(difference any, deep int) string {
 	case []any:
 		if len(v) == 0 {
 			builder.WriteString("[]\n")
-		} else {
-			builder.WriteString("[\n")
-			for _, item := range v {
-				writeValue(" ", "", item, deep+1)
-			}
-			builder.WriteString(pad)
-			builder.WriteString("]\n")
+			return builder.String()
+		}
 
+		builder.WriteString("[\n")
+
+		for _, item := range v {
+			d, isDiff := item.(diff.Diff)
+			if isDiff {
+				printDiff(d, "", deep+1)
+				continue
+			}
+			writeValue(" ", "", item, deep+1)
+		}
+
+		builder.WriteString(pad)
+		builder.WriteString("]")
+		if deep != 0 {
+			builder.WriteString("\n")
 		}
 	}
 

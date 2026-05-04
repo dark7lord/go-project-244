@@ -25,20 +25,20 @@ func TestPrintDiff(t *testing.T) {
 	tests := []struct {
 		name   string
 		diff   any
-		format string
+		format PrintFormat
 		want   string
 		path   string
 	}{
 		{
 			name:   "primitive",
 			diff:   "value",
-			format: "stylish",
+			format: Stylish,
 			want:   "value",
 		},
 		{
 			name:   "null",
 			diff:   nil,
-			format: "stylish",
+			format: Stylish,
 			want:   "null",
 		},
 		{
@@ -68,7 +68,7 @@ func TestPrintDiff(t *testing.T) {
 					NewValue: "new value",
 				},
 			},
-			format: "stylish",
+			format: Stylish,
 			path:   filepath.Join("testdata", "fixture", "flatMap.diff"),
 		},
 		{
@@ -109,7 +109,7 @@ func TestPrintDiff(t *testing.T) {
 					},
 				},
 			},
-			format: "stylish",
+			format: Stylish,
 			path:   filepath.Join("testdata", "fixture", "nestedMap.diff"),
 		},
 		{
@@ -138,7 +138,7 @@ func TestPrintDiff(t *testing.T) {
 					NewValue: "unchanged value",
 				},
 			},
-			format: "plain",
+			format: Plain,
 			path:   filepath.Join("testdata", "fixture", "plainFlat.txt"),
 		},
 		{
@@ -168,7 +168,7 @@ func TestPrintDiff(t *testing.T) {
 					},
 				},
 			},
-			format: "plain",
+			format: Plain,
 			path:   filepath.Join("testdata", "fixture", "plainNested.txt"),
 		},
 		{
@@ -195,14 +195,15 @@ func TestPrintDiff(t *testing.T) {
 					NewValue: "new value",
 				},
 			},
-			format: "json",
+			format: JSON,
 			path:   filepath.Join("testdata", "fixture", "jsonNested.json"),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := PrintDiff(tt.diff, tt.format)
+			got, err := PrintDiff(tt.diff, tt.format)
+			require.NoError(t, err, "PrintDiff() returned an error: %v", err)
 			actual := strings.TrimSpace(got)
 
 			if tt.path != "" {

@@ -14,14 +14,14 @@ func cleanDiff(difference any) any {
 		}
 
 		switch d.TypeDiff {
-		case diff.DiffTypeAdded:
+		case diff.Added:
 			result["NewValue"] = d.NewValue
-		case diff.DiffTypeRemoved:
+		case diff.Removed:
 			result["OldValue"] = d.OldValue
-		case diff.DiffTypeChanged:
+		case diff.Changed:
 			result["OldValue"] = d.OldValue
 			result["NewValue"] = d.NewValue
-		case diff.DiffTypeUnchanged:
+		case diff.Unchanged:
 			return cleanDiff(d.OldValue)
 		}
 
