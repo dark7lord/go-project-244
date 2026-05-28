@@ -1,21 +1,24 @@
 {
-    key1: value1
-    key2: {
-        nestedKey: nestedValue
+    outerUnchanged: value1
+    outerNested: {
+        nestedUnchanged: nestedValue
+      + nestedAdded: addedNestedValue
+      - nestedRemoved: removedNestedValue
+        nestedDeep: {
+          - deepChanged: oldDeepValue
+          + deepChanged: newDeepValue
+        }
     }
-  + key3: {
+  + outerAdded: {
         addedNestedKey: addedNestedValue
     }
-  - key4: {
+  - outerRemoved: {
         removedNestedKey: removedNestedValue
     }
-  - key5: {
+  - outerChanged: {
         oldNestedKey: oldNestedValue
     }
-  + key5: {
+  + outerChanged: {
         newNestedKey: newNestedValue
-    }
-    key6: {
-        unchangedNestedKey: unchangedNestedValue
     }
 }

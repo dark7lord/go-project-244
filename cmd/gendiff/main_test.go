@@ -25,7 +25,7 @@ func TestRunSuccess(t *testing.T) {
 	os.Stdout = writePipe
 
 	os.Args = []string{
-		"gendiff",
+		binaryName,
 		filepath.Join("..", "..", "testdata", "fixture", "fileA.json"),
 		filepath.Join("..", "..", "testdata", "fixture", "fileB.json"),
 	}
@@ -50,7 +50,7 @@ func TestRunInvalidArgs(t *testing.T) {
 	oldArgs := os.Args
 	defer func() { os.Args = oldArgs }()
 
-	os.Args = []string{"gendiff", "fileA.json"}
+	os.Args = []string{binaryName, "fileA.json"}
 
 	err := Run()
 	if err == nil {
@@ -68,7 +68,7 @@ func TestRunUnsupportedFormat(t *testing.T) {
 	defer func() { os.Args = oldArgs }()
 
 	os.Args = []string{
-		"gendiff",
+		binaryName,
 		"--format",
 		"invalid",
 		filepath.Join("..", "..", "testdata", "fixture", "fileA.json"),
@@ -102,7 +102,7 @@ func TestMainCallsRun(t *testing.T) {
 	os.Stdout = writePipe
 
 	os.Args = []string{
-		"gendiff",
+		binaryName,
 		filepath.Join("..", "..", "testdata", "fixture", "fileA.json"),
 		filepath.Join("..", "..", "testdata", "fixture", "fileB.json"),
 	}

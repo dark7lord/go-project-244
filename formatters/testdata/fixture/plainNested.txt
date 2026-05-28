@@ -1,3 +1,6 @@
-Property 'key2.nestedKey2' was added with value: 'addedNestedValue'
-Property 'key2.nestedKey3' was removed
-Property 'key2.nestedKey4.deepNestedKey' was updated. From 'oldDeepNestedValue' to 'newDeepNestedValue'
+Property 'outerNested.nestedAdded' was added with value: 'addedNestedValue'
+Property 'outerNested.nestedRemoved' was removed
+Property 'outerNested.nestedDeep.deepChanged' was updated. From 'oldDeepValue' to 'newDeepValue'
+Property 'outerAdded' was added with value: [complex value]
+Property 'outerRemoved' was removed
+Property 'outerChanged' was updated. From [complex value] to [complex value]

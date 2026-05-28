@@ -1,15 +1,28 @@
 {
-  "key1": "string value 1",
-  "key2": 42,
-  "key3": false,
-  "key4": null,
-  "key5": {
-    "nestedKey": "nestedValue",
-    "nestedKey2 [added]": "added nested value"
+  "outerAdded [added]": {
+    "addedNestedKey": "addedNestedValue"
   },
-  "key6 [deleted]": "deleted value",
-  "key7 [changed]": {
-    "[new value]": "new value",
-    "[old value]": "old value"
-  }
+  "outerChanged [changed]": {
+    "[new value]": {
+      "newNestedKey": "newNestedValue"
+    },
+    "[old value]": {
+      "oldNestedKey": "oldNestedValue"
+    }
+  },
+  "outerNested": {
+    "nestedAdded [added]": "addedNestedValue",
+    "nestedDeep": {
+      "deepChanged [changed]": {
+        "[new value]": "newDeepValue",
+        "[old value]": "oldDeepValue"
+      }
+    },
+    "nestedRemoved [deleted]": "removedNestedValue",
+    "nestedUnchanged": "nestedValue"
+  },
+  "outerRemoved [deleted]": {
+    "removedNestedKey": "removedNestedValue"
+  },
+  "outerUnchanged": "value1"
 }

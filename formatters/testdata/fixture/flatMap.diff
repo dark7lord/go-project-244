@@ -1,12 +1,10 @@
 {
-    key1: string value
-    key2: 42
-    key3: 
-    key4: null
-    key5: true
-  + key6: added value
-  - key7: removed value
-    key8: unchanged value
-  - key9: old value
-  + key9: new value
+    stringKey: string value
+    numberKey: 42
+    boolKey: true
+    nullKey: null
+  + addedKey: added value
+  - removedKey: removed value
+  - changedKey: old value
+  + changedKey: new value
 }

@@ -13,9 +13,11 @@ import (
 	"code/formatters"
 )
 
+const binaryName = "gendiff"
+
 func Run() error {
 	cmd := &cli.Command{
-		Name:                  "gendiff",
+		Name:                  binaryName,
 		Usage:                 "Compares two configuration files and shows a difference.",
 		EnableShellCompletion: true,
 		Flags: []cli.Flag{

@@ -1,8 +1,6 @@
 package formatters_test
 
 import (
-	"os"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -11,14 +9,11 @@ import (
 	"code/formatters"
 )
 
-func readFileToString(t *testing.T, path string) string {
-	t.Helper()
-
-	data, err := os.ReadFile(path)
-	require.NoError(t, err, "failed to read file %s", path)
-
-	return strings.TrimSpace(string(data))
-}
+const (
+	stylish = "stylish"
+	plain   = "plain"
+	json    = "json"
+)
 
 func TestIsValidFormat(t *testing.T) {
 	tests := []struct {
@@ -26,9 +21,9 @@ func TestIsValidFormat(t *testing.T) {
 		format string
 		want   bool
 	}{
-		{name: "stylish", format: "stylish", want: true},
-		{name: "plain", format: "plain", want: true},
-		{name: "json", format: "json", want: true},
+		{name: stylish, format: stylish, want: true},
+		{name: plain, format: plain, want: true},
+		{name: json, format: json, want: true},
 		{name: "unknown", format: "xml", want: false},
 	}
 
@@ -44,7 +39,7 @@ func TestPrintDiff(t *testing.T) {
 		TypeDiff: diff.Nested,
 		Children: []diff.Node{
 			{
-				Key:      "key",
+				Key:      "Key",
 				TypeDiff: diff.Added,
 				NewValue: "value",
 			},
@@ -58,19 +53,19 @@ func TestPrintDiff(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:   "stylish",
+			name:   stylish,
 			format: formatters.Stylish,
-			want:   "{\n  + key: value\n}",
+			want:   "{\n  + Key: value\n}",
 		},
 		{
-			name:   "plain",
+			name:   plain,
 			format: formatters.Plain,
-			want:   "Property 'key' was added with value: 'value'",
+			want:   "Property 'Key' was added with value: 'value'",
 		},
 		{
-			name:   "json",
+			name:   json,
 			format: formatters.JSON,
-			want:   "{\n  \"key [added]\": \"value\"\n}",
+			want:   "{\n  \"Key [added]\": \"value\"\n}",
 		},
 		{
 			name:    "unsupported format",
