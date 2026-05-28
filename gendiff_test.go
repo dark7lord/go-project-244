@@ -84,3 +84,50 @@ func TestGendiff(t *testing.T) {
 		})
 	}
 }
+
+func TestGenDiffErrors(t *testing.T) {
+	tests := []struct {
+		name        string
+		pathA       string
+		pathB       string
+		format      string
+		expectedErr string
+	}{
+		{
+			name:        "invalid first file",
+			pathA:       fixturePath("invalid.json"),
+			pathB:       fixturePath("fileA.json"),
+			format:      "stylish",
+			expectedErr: "",
+		},
+		{
+			name:        "invalid second file",
+			pathA:       fixturePath("fileA.json"),
+			pathB:       fixturePath("invalid.yaml"),
+			format:      "stylish",
+			expectedErr: "",
+		},
+		{
+			name:        "unsupported format",
+			pathA:       fixturePath("fileA.json"),
+			pathB:       fixturePath("fileB.json"),
+			format:      "xml",
+			expectedErr: "unsupported format: xml",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := GenDiff(tt.pathA, tt.pathB, tt.format)
+
+			if tt.expectedErr == "" {
+				require.Error(t, err)
+				assert.Empty(t, result)
+				return
+			}
+
+			require.EqualError(t, err, tt.expectedErr)
+			assert.Empty(t, result)
+		})
+	}
+}

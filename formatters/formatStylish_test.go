@@ -150,6 +150,56 @@ func TestFormatStylish(t *testing.T) {
 			},
 			path: filepath.Join("testdata", "fixture", "nestedMap.diff"),
 		},
+		{
+			name: "empty nested object",
+			diff: diff.Node{
+				TypeDiff: diff.Nested,
+				Children: []diff.Node{},
+			},
+			want: "{}",
+		},
+		{
+			name: "added empty slice",
+			diff: diff.Node{
+				TypeDiff: diff.Nested,
+				Children: []diff.Node{
+					{
+						Key:      "arr",
+						TypeDiff: diff.Added,
+						NewValue: []any{},
+					},
+				},
+			},
+			want: "{\n  + arr: []\n}",
+		},
+		{
+			name: "added empty map",
+			diff: diff.Node{
+				TypeDiff: diff.Nested,
+				Children: []diff.Node{
+					{
+						Key:      "obj",
+						TypeDiff: diff.Added,
+						NewValue: map[string]any{},
+					},
+				},
+			},
+			want: "{\n  + obj: {}\n}",
+		},
+		{
+			name: "added non-empty slice",
+			diff: diff.Node{
+				TypeDiff: diff.Nested,
+				Children: []diff.Node{
+					{
+						Key:      "arr",
+						TypeDiff: diff.Added,
+						NewValue: []any{"x"},
+					},
+				},
+			},
+			want: "{\n  + arr: [\n        x\n    ]\n}",
+		},
 	}
 
 	for _, tt := range tests {
@@ -163,7 +213,6 @@ func TestFormatStylish(t *testing.T) {
 				if actual != expected {
 					diff := cmp.Diff(expected, actual)
 					t.Errorf("PrintDiff() mismatch (-want +got):\n%s", diff)
-					// t.Errorf("PrintDiff() = %v, want %v", actual, expected)
 				}
 			} else if actual != tt.want {
 				t.Errorf("PrintDiff() = %v, want %v", actual, tt.want)

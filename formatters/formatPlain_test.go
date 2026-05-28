@@ -112,6 +112,56 @@ func TestFormatPlain(t *testing.T) {
 			},
 			path: filepath.Join("testdata", "fixture", "plainNested.txt"),
 		},
+		{
+			name: "plain format empty nested object",
+			diff: diff.Node{
+				TypeDiff: diff.Nested,
+				Children: []diff.Node{},
+			},
+			want: "",
+		},
+		{
+			name: "plain format added complex value",
+			diff: diff.Node{
+				TypeDiff: diff.Nested,
+				Children: []diff.Node{
+					{
+						Key:      "complexKey",
+						TypeDiff: diff.Added,
+						NewValue: []any{1.0, 2.0},
+					},
+				},
+			},
+			want: "Property 'complexKey' was added with value: [complex value]",
+		},
+		{
+			name: "plain format added nil value",
+			diff: diff.Node{
+				TypeDiff: diff.Nested,
+				Children: []diff.Node{
+					{
+						Key:      "nullKey",
+						TypeDiff: diff.Added,
+						NewValue: nil,
+					},
+				},
+			},
+			want: "Property 'nullKey' was added with value: null",
+		},
+		{
+			name: "plain format added bool value",
+			diff: diff.Node{
+				TypeDiff: diff.Nested,
+				Children: []diff.Node{
+					{
+						Key:      "boolKey",
+						TypeDiff: diff.Added,
+						NewValue: true,
+					},
+				},
+			},
+			want: "Property 'boolKey' was added with value: true",
+		},
 	}
 
 	for _, tt := range tests {
@@ -119,9 +169,6 @@ func TestFormatPlain(t *testing.T) {
 			got, err := formatters.PrintDiff(tt.diff, formatters.Plain)
 			require.NoError(t, err, "PrintDiff() returned an error: %v", err)
 			actual := strings.TrimSpace(got)
-
-			// fmt.Println(tt.diff)
-			// fmt.Println(actual)
 
 			if tt.path != "" {
 				expected := readFileToString(t, tt.path)

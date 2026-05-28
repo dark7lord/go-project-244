@@ -56,8 +56,6 @@ func formatJSON(df diff.Node) (string, error) {
 	cleaned := transformDiff(df)
 	jsonDiff, err := json.MarshalIndent(cleaned, "", "  ")
 
-	// fmt.Println(df)
-
 	if err != nil {
 		return "", err
 	}

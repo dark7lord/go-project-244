@@ -75,6 +75,14 @@ func TestFormatJSON(t *testing.T) {
 			},
 			path: filepath.Join("testdata", "fixture", "jsonNested.json"),
 		},
+		{
+			name: "empty nested object",
+			diff: diff.Node{
+				TypeDiff: diff.Nested,
+				Children: []diff.Node{},
+			},
+			want: "{}",
+		},
 	}
 
 	for _, tt := range tests {
@@ -94,4 +102,14 @@ func TestFormatJSON(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestFormatJSONMarshalError(t *testing.T) {
+	_, err := formatters.PrintDiff(diff.Node{
+		TypeDiff: diff.Unchanged,
+		OldValue: make(chan int),
+	}, formatters.JSON)
+
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "unsupported type")
 }
