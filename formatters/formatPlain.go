@@ -56,11 +56,11 @@ func formatPlain(df diff.Node, keys []string) string {
 				continue
 			}
 
-			builder.WriteString(result)
-
-			if child.TypeDiff != diff.Nested {
+			if builder.Len() > 0 {
 				builder.WriteByte('\n')
 			}
+
+			builder.WriteString(result)
 		}
 
 		return builder.String()

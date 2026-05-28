@@ -13,6 +13,23 @@ import (
 	"code/formatters"
 )
 
+func TestFormatPlainNoTrailingNewline(t *testing.T) {
+	diffNode := diff.Node{
+		TypeDiff: diff.Nested,
+		Children: []diff.Node{
+			{
+				Key:      "key1",
+				TypeDiff: diff.Added,
+				NewValue: "added value",
+			},
+		},
+	}
+
+	got, err := formatters.PrintDiff(diffNode, formatters.Plain)
+	require.NoError(t, err, "PrintDiff() returned an error: %v", err)
+	require.Equal(t, "Property 'key1' was added with value: 'added value'", got)
+}
+
 func TestFormatPlain(t *testing.T) {
 	tests := []struct {
 		name string

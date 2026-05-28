@@ -65,7 +65,7 @@ func TestPrintDiff(t *testing.T) {
 		{
 			name:   "plain",
 			format: formatters.Plain,
-			want:   "Property 'key' was added with value: 'value'\n",
+			want:   "Property 'key' was added with value: 'value'",
 		},
 		{
 			name:   "json",
