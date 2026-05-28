@@ -1,5 +1,7 @@
+BIN := bin/gendiff
+
 build:
-	go build -o bin/gendiff ./cmd/gendiff/main.go
+	go build -o $(BIN) ./cmd/gendiff/main.go
 
 lint:
 	golangci-lint run
@@ -13,10 +15,19 @@ fmt:
 test:
 	go test ./... -v
 
+
+ARGS ?= file1.json file2.json
+
+run: build
+	$(BIN) $(ARGS)
+
 cover:
 	go test ./... -coverprofile=coverage.out
 	go tool cover -func=coverage.out
-# 	go tool cover -html=coverage.out
+	go tool cover -html=coverage.out
+
+clean:
+	rm -f $(BIN)
 
 
-.PHONY: test fmt lint-fix lint build cover
+.PHONY: test fmt lint-fix lint build cover clean run

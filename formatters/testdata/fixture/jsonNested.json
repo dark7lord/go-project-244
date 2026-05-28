@@ -5,18 +5,11 @@
   "key4": null,
   "key5": {
     "nestedKey": "nestedValue",
-    "nestedKey2": {
-      "NewValue": "added nested value",
-      "TypeDiff": "added"
-    }
+    "nestedKey2 [added]": "added nested value"
   },
-  "key6": {
-    "OldValue": "deleted value",
-    "TypeDiff": "removed"
-  },
-  "key7": {
-    "NewValue": "new value",
-    "OldValue": "old value",
-    "TypeDiff": "changed"
+  "key6 [deleted]": "deleted value",
+  "key7 [changed]": {
+    "[new value]": "new value",
+    "[old value]": "old value"
   }
 }

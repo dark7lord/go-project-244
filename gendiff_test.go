@@ -8,8 +8,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"code/diff"
 )
 
 func readFileToString(t *testing.T, path string) string {
@@ -83,85 +81,6 @@ func TestGendiff(t *testing.T) {
 			expected := readFileToString(t, tt.expectedPath)
 
 			assert.Equal(t, expected, actual, "diff mismatch for case %s", tt.name)
-		})
-	}
-}
-
-func TestGenSliceDiff(t *testing.T) {
-	tests := []struct {
-		name  string
-		left  []any
-		right []any
-		want  []any
-	}{
-		{
-			name:  "same slices",
-			left:  []any{1, 2, 3},
-			right: []any{1, 2, 3},
-			want: []any{
-				diff.Diff{
-					TypeDiff: diff.Unchanged,
-					OldValue: 1.0,
-				},
-				diff.Diff{
-					TypeDiff: diff.Unchanged,
-					OldValue: 2.0,
-				},
-				diff.Diff{
-					TypeDiff: diff.Unchanged,
-					OldValue: 3.0,
-				},
-			},
-		},
-		{
-			name:  "flat arrays with adding",
-			left:  []any{1, 2, 3},
-			right: []any{1, 4, 3, 5},
-			want: []any{
-				diff.Diff{
-					TypeDiff: diff.Unchanged,
-					OldValue: 1.0,
-				},
-				diff.Diff{
-					TypeDiff: diff.Changed,
-					OldValue: 2.0,
-					NewValue: 4.0,
-				},
-				diff.Diff{
-					TypeDiff: diff.Unchanged,
-					OldValue: 3.0,
-				},
-				diff.Diff{
-					TypeDiff: diff.Added,
-					NewValue: 5.0,
-				},
-			},
-		},
-		{
-			name:  "flat arrays with removing",
-			left:  []any{1, 2, 3},
-			right: []any{1, 2},
-			want: []any{
-				diff.Diff{
-					TypeDiff: diff.Unchanged,
-					OldValue: 1.0,
-				},
-				diff.Diff{
-					TypeDiff: diff.Unchanged,
-					OldValue: 2.0,
-				},
-				diff.Diff{
-					TypeDiff: diff.Removed,
-					OldValue: 3.0,
-				},
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := genSliceDiff(tt.left, tt.right)
-			assert.Equal(t, got, tt.want, "got: \n\t%v\n, but want: \n\t%v\n", got, tt.want)
 		})
 	}
 }

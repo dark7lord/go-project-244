@@ -4,6 +4,8 @@ package formatters
 import (
 	"fmt"
 	"slices"
+
+	"code/diff"
 )
 
 // PrintFormat type represents the format in which the difference between files can be printed
@@ -24,14 +26,14 @@ func IsValidFormat(format string) bool {
 }
 
 // PrintDiff function returns the difference between two structures as a string in the specified format
-func PrintDiff(diff any, format PrintFormat) (string, error) {
+func PrintDiff(diff diff.Node, format PrintFormat) (string, error) {
 	switch format {
 	case Stylish:
-		return printStylishDiff(diff, 0), nil
+		return formatStylish(diff, 0), nil
 	case JSON:
-		return printJSONDiff(diff), nil
+		return formatJSON(diff)
 	case Plain:
-		return printPlainDiff(diff, []string{}), nil
+		return formatPlain(diff, []string{}), nil
 	default:
 		return "", fmt.Errorf("unsupported format: %s", format)
 	}

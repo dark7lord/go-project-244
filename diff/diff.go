@@ -10,12 +10,14 @@ const (
 	Removed   Kind = "removed"
 	Changed   Kind = "changed"
 	Unchanged Kind = "unchanged"
+	Nested    Kind = "nested"
 )
 
-// Diff struct represents the difference between two values
-type Diff struct {
+// Node struct represents the difference between two values
+type Node struct {
 	Key      string
 	TypeDiff Kind
 	OldValue any
 	NewValue any
+	Children []Node
 }
