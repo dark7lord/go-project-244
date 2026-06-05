@@ -4,7 +4,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/urfave/cli/v3"
@@ -13,7 +12,13 @@ import (
 	"code/formatters"
 )
 
-const binaryName = "gendiff"
+const (
+	binaryName  = "gendiff"
+	ExitOK      = 0
+	ExitGeneral = 1
+	ExitUsage   = 64
+	ExitDataErr = 65
+)
 
 func Run() error {
 	cmd := &cli.Command{
@@ -31,12 +36,14 @@ func Run() error {
 		},
 		Action: func(_ context.Context, cmd *cli.Command) error {
 			if argsCount := cmd.NArg(); argsCount != 2 {
-				return fmt.Errorf("expected 2 file paths, got %d", argsCount)
+				msg := fmt.Errorf("expected 2 file paths, got %d", argsCount)
+				return cli.Exit(msg, ExitUsage)
 			}
 
 			format := cmd.String("format")
 			if !formatters.IsValidFormat(format) {
-				return fmt.Errorf("unsupported format: %s", format)
+				msg := fmt.Errorf("unsupported format: %s", format)
+				return cli.Exit(msg, ExitDataErr)
 			}
 
 			filepathA := cmd.Args().Get(0)
@@ -44,7 +51,8 @@ func Run() error {
 
 			diff, err := code.GenDiff(filepathA, filepathB, format)
 			if err != nil {
-				return err
+				msg := fmt.Sprintf("error: %s", err.Error())
+				return cli.Exit(msg, ExitGeneral)
 			}
 
 			fmt.Print(diff)
@@ -58,6 +66,12 @@ func Run() error {
 
 func main() {
 	if err := Run(); err != nil {
-		log.Fatal(err)
+		if exitErr, ok := err.(cli.ExitCoder); ok {
+			fmt.Fprintln(os.Stderr, exitErr.Error())
+			os.Exit(exitErr.ExitCode())
+		}
+
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(ExitGeneral)
 	}
 }
