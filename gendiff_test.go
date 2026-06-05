@@ -72,6 +72,18 @@ func TestGendiff(t *testing.T) {
 			pathB:        fixturePath("fileF.json"),
 			expectedPath: fixturePath("expectedEF.diff"),
 		},
+		{
+			name:         "GG same files",
+			pathA:        fixturePath("fileG.json"),
+			pathB:        fixturePath("fileG.json"),
+			expectedPath: fixturePath("expectedGG.diff"),
+		},
+		{
+			name:         "GH identical files",
+			pathA:        fixturePath("fileG.json"),
+			pathB:        fixturePath("fileH.json"),
+			expectedPath: fixturePath("expectedGH.diff"),
+		},
 	}
 
 	for _, tt := range tests {
