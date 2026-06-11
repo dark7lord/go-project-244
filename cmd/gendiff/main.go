@@ -36,14 +36,12 @@ func Run() error {
 		},
 		Action: func(_ context.Context, cmd *cli.Command) error {
 			if argsCount := cmd.NArg(); argsCount != 2 {
-				msg := fmt.Errorf("expected 2 file paths, got %d", argsCount)
-				return cli.Exit(msg, ExitUsage)
+				return fmt.Errorf("expected 2 file paths, got %d", argsCount)
 			}
 
 			format := cmd.String("format")
 			if !formatters.IsValidFormat(format) {
-				msg := fmt.Errorf("unsupported format: %s", format)
-				return cli.Exit(msg, ExitDataErr)
+				return fmt.Errorf("unsupported format: %s", format)
 			}
 
 			filepathA := cmd.Args().Get(0)
@@ -51,8 +49,7 @@ func Run() error {
 
 			diff, err := code.GenDiff(filepathA, filepathB, format)
 			if err != nil {
-				msg := fmt.Sprintf("error: %s", err.Error())
-				return cli.Exit(msg, ExitGeneral)
+				return err
 			}
 
 			fmt.Print(diff)
@@ -66,12 +63,7 @@ func Run() error {
 
 func main() {
 	if err := Run(); err != nil {
-		if exitErr, ok := err.(cli.ExitCoder); ok {
-			fmt.Fprintln(os.Stderr, exitErr.Error())
-			os.Exit(exitErr.ExitCode())
-		}
-
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(ExitGeneral)
+		os.Exit(1)
 	}
 }
