@@ -11,6 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// ErrUnsupportedFileType is returned when the file type is not supported
 var ErrUnsupportedFileType = errors.New("unsupported file type")
 
 func parseJSON(data []byte) (any, error) {

@@ -77,6 +77,7 @@ func TestParse(t *testing.T) {
 				if tt.name == "unsupported file type" {
 					assert.True(t, errors.Is(err, ErrUnsupportedFileType))
 				}
+
 				return
 			}
 
