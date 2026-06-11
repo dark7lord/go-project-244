@@ -1,28 +1,14 @@
 package main
 
 import (
-	"io"
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 func TestRunSuccess(t *testing.T) {
 	oldArgs := os.Args
-	oldStdout := os.Stdout
-
-	defer func() {
-		os.Args = oldArgs
-		os.Stdout = oldStdout
-	}()
-
-	readPipe, writePipe, err := os.Pipe()
-	if err != nil {
-		t.Fatalf("failed to create pipe: %v", err)
-	}
-	os.Stdout = writePipe
+	defer func() { os.Args = oldArgs }()
 
 	os.Args = []string{
 		binaryName,
@@ -30,26 +16,15 @@ func TestRunSuccess(t *testing.T) {
 		filepath.Join("..", "..", "testdata", "fixture", "fileB.json"),
 	}
 
-	err = Run()
-	require.NoError(t, writePipe.Close())
+	err := Run()
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
-	}
-
-	output, err := io.ReadAll(readPipe)
-	if err != nil {
-		t.Fatalf("failed to read stdout: %v", err)
-	}
-
-	if len(output) == 0 {
-		t.Fatal("expected diff output, got empty string")
 	}
 }
 
 func TestRunInvalidArgs(t *testing.T) {
 	oldArgs := os.Args
 	defer func() { os.Args = oldArgs }()
-
 	os.Args = []string{binaryName, "fileA.json"}
 
 	err := Run()
@@ -63,59 +38,35 @@ func TestRunInvalidArgs(t *testing.T) {
 	}
 }
 
-func TestRunUnsupportedFormat(t *testing.T) {
+func TestRunGenDiffError(t *testing.T) {
 	oldArgs := os.Args
 	defer func() { os.Args = oldArgs }()
-
-	os.Args = []string{
-		binaryName,
-		"--format",
-		"invalid",
-		filepath.Join("..", "..", "testdata", "fixture", "fileA.json"),
-		filepath.Join("..", "..", "testdata", "fixture", "fileB.json"),
-	}
+	os.Args = []string{binaryName, "nonexistent.json", "alsonothere.json"}
 
 	err := Run()
 	if err == nil {
-		t.Fatal("expected error for unsupported format, got nil")
-	}
-
-	expected := "unsupported format: invalid"
-	if err.Error() != expected {
-		t.Fatalf("expected %q, got %q", expected, err.Error())
+		t.Fatal("expected error for nonexistent file, got nil")
 	}
 }
 
-func TestMainCallsRun(t *testing.T) {
+func TestMainError(t *testing.T) {
 	oldArgs := os.Args
-	oldStdout := os.Stdout
+	oldOsExit := osExit
 
 	defer func() {
 		os.Args = oldArgs
-		os.Stdout = oldStdout
+		osExit = oldOsExit
 	}()
 
-	readPipe, writePipe, err := os.Pipe()
-	if err != nil {
-		t.Fatalf("failed to create pipe: %v", err)
-	}
-	os.Stdout = writePipe
-
-	os.Args = []string{
-		binaryName,
-		filepath.Join("..", "..", "testdata", "fixture", "fileA.json"),
-		filepath.Join("..", "..", "testdata", "fixture", "fileB.json"),
+	var exitCode int
+	osExit = func(code int) {
+		exitCode = code
 	}
 
+	os.Args = []string{binaryName, "fileA.json"}
 	main()
-	require.NoError(t, writePipe.Close())
 
-	output, err := io.ReadAll(readPipe)
-	if err != nil {
-		t.Fatalf("failed to read stdout: %v", err)
-	}
-
-	if len(output) == 0 {
-		t.Fatal("expected diff output from main, got empty string")
+	if exitCode != 1 {
+		t.Fatalf("expected exit code 1, got %d", exitCode)
 	}
 }

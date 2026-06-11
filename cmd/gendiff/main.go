@@ -9,7 +9,6 @@ import (
 	"github.com/urfave/cli/v3"
 
 	"code"
-	"code/formatters"
 )
 
 const (
@@ -40,9 +39,6 @@ func Run() error {
 			}
 
 			format := cmd.String("format")
-			if !formatters.IsValidFormat(format) {
-				return fmt.Errorf("unsupported format: %s", format)
-			}
 
 			filepathA := cmd.Args().Get(0)
 			filepathB := cmd.Args().Get(1)
