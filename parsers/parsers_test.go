@@ -31,12 +31,12 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name:    "invalid json",
-			path:    filepath.Join(fixtureDir, "invalid.json"),
+			path:    filepath.Join(fixtureDir, "invalid", "invalid.json"),
 			wantErr: true,
 		},
 		{
 			name:    "invalid yml",
-			path:    filepath.Join(fixtureDir, "invalid.yaml"),
+			path:    filepath.Join(fixtureDir, "invalid", "invalid.yaml"),
 			wantErr: true,
 		},
 		{

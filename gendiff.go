@@ -27,10 +27,5 @@ func GenDiff(pathA, pathB, format string) (string, error) {
 
 	diff := diff_builder.RecursiveGendiff(dataA, dataB)
 	typedFormat := formatters.PrintFormat(format)
-	result, err := formatters.PrintDiff(diff, typedFormat)
-	if err != nil {
-		return "", err
-	}
-
-	return result, nil
+	return formatters.PrintDiff(diff, typedFormat)
 }
