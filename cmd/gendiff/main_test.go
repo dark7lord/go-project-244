@@ -2,8 +2,12 @@ package main
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRunSuccess(t *testing.T) {
@@ -12,8 +16,8 @@ func TestRunSuccess(t *testing.T) {
 
 	os.Args = []string{
 		binaryName,
-		filepath.Join("..", "..", "testdata", "fixture", "fileA.json"),
-		filepath.Join("..", "..", "testdata", "fixture", "fileB.json"),
+		filepath.Join("..", "..", "testdata", "gendiff", "fixture", "flat", "fileA.json"),
+		filepath.Join("..", "..", "testdata", "gendiff", "fixture", "flat", "fileB.json"),
 	}
 
 	err := Run()
@@ -50,23 +54,19 @@ func TestRunGenDiffError(t *testing.T) {
 }
 
 func TestMainError(t *testing.T) {
-	oldArgs := os.Args
-	oldOsExit := osExit
-
-	defer func() {
-		os.Args = oldArgs
-		osExit = oldOsExit
-	}()
-
-	var exitCode int
-	osExit = func(code int) {
-		exitCode = code
+	if os.Getenv("TEST_GENDIFF_MAIN") == "1" {
+		os.Args = []string{binaryName, "fileA.json"}
+		main()
+		return
 	}
 
-	os.Args = []string{binaryName, "fileA.json"}
-	main()
+	cmd := exec.Command(os.Args[0], "-test.run=TestMainError")
+	cmd.Env = append(os.Environ(), "TEST_GENDIFF_MAIN=1")
 
-	if exitCode != 1 {
-		t.Fatalf("expected exit code 1, got %d", exitCode)
-	}
+	err := cmd.Run()
+	require.Error(t, err)
+
+	exitErr, ok := err.(*exec.ExitError)
+	require.True(t, ok, "expected process to exit with non-zero status")
+	assert.Equal(t, 1, exitErr.ExitCode())
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var fixtureDir = filepath.Join("..", "testdata", "fixture")
+var fixtureDir = filepath.Join("..", "testdata", "gendiff", "fixture")
 
 func TestParse(t *testing.T) {
 	tests := []struct {
@@ -41,7 +41,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: "valid json",
-			path: filepath.Join(fixtureDir, "fileA.json"),
+			path: filepath.Join(fixtureDir, "flat", "fileA.json"),
 			expected: map[string]any{
 				"host":    "hexlet.io",
 				"timeout": 50.0,
@@ -51,7 +51,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: "valid yml",
-			path: filepath.Join(fixtureDir, "fileA.yml"),
+			path: filepath.Join(fixtureDir, "flat", "fileA.yml"),
 			expected: map[string]any{
 				"host":    "hexlet.io",
 				"timeout": 50,
@@ -61,7 +61,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name:    "unsupported file type",
-			path:    filepath.Join(fixtureDir, "fileA.xml"),
+			path:    filepath.Join(fixtureDir, "invalid", "fileA.xml"),
 			wantErr: true,
 		},
 	}

@@ -19,8 +19,31 @@ func readFileToString(t *testing.T, path string) string {
 	return strings.TrimSpace(string(data))
 }
 
+const (
+	fixtureFlatAJSON   = "flat/fileA.json"
+	fixtureFlatBJSON   = "flat/fileB.json"
+	fixtureFlatCJSON   = "flat/fileC.json"
+	fixtureFlatDJSON   = "flat/fileD.json"
+	fixtureNestedAJSON = "nested/fileE.json"
+	fixtureNestedBJSON = "nested/fileF.json"
+	fixtureSameAJSON   = "flat/fileG.json"
+	fixtureSameBJSON   = "flat/fileH.json"
+	fixtureAAYML       = "flat/fileA.yml"
+	fixtureBYML        = "flat/fileB.yml"
+	fixtureInvalidJSON = "invalid/invalid.json"
+	fixtureInvalidYAML = "invalid/invalid.yaml"
+
+	expectedABDiff = "expected/expectedAB.diff"
+	expectedACDiff = "expected/expectedAC.diff"
+	expectedCDDiff = "expected/expectedCD.diff"
+	expectedAADiff = "expected/expectedAA.diff"
+	expectedEFDiff = "expected/expectedEF.diff"
+	expectedGGDiff = "expected/expectedGG.diff"
+	expectedGHDiff = "expected/expectedGH.diff"
+)
+
 func fixturePath(name string) string {
-	return filepath.Join("testdata", "fixture", name)
+	return filepath.Join("testdata", "gendiff", "fixture", name)
 }
 
 func TestGendiff(t *testing.T) {
@@ -32,63 +55,64 @@ func TestGendiff(t *testing.T) {
 	}{
 		{
 			name:         "AB flat json",
-			pathA:        fixturePath("fileA.json"),
-			pathB:        fixturePath("fileB.json"),
-			expectedPath: fixturePath("expectedAB.diff"),
+			pathA:        fixturePath(fixtureFlatAJSON),
+			pathB:        fixturePath(fixtureFlatBJSON),
+			expectedPath: fixturePath(expectedABDiff),
 		},
 		{
 			name:         "AC",
-			pathA:        fixturePath("fileA.json"),
-			pathB:        fixturePath("fileC.json"),
-			expectedPath: fixturePath("expectedAC.diff"),
+			pathA:        fixturePath(fixtureFlatAJSON),
+			pathB:        fixturePath(fixtureFlatCJSON),
+			expectedPath: fixturePath(expectedACDiff),
 		},
 		{
 			name:         "CD",
-			pathA:        fixturePath("fileC.json"),
-			pathB:        fixturePath("fileD.json"),
-			expectedPath: fixturePath("expectedCD.diff"),
+			pathA:        fixturePath(fixtureFlatCJSON),
+			pathB:        fixturePath(fixtureFlatDJSON),
+			expectedPath: fixturePath(expectedCDDiff),
 		},
 		{
 			name:         "AA json vs yaml",
-			pathA:        fixturePath("fileA.json"),
-			pathB:        fixturePath("fileA.yml"),
-			expectedPath: fixturePath("expectedAA.diff"),
+			pathA:        fixturePath(fixtureFlatAJSON),
+			pathB:        fixturePath(fixtureAAYML),
+			expectedPath: fixturePath(expectedAADiff),
 		},
 		{
 			name:         "AA yaml vs json",
-			pathA:        fixturePath("fileA.yml"),
-			pathB:        fixturePath("fileA.json"),
-			expectedPath: fixturePath("expectedAA.diff"),
+			pathA:        fixturePath(fixtureAAYML),
+			pathB:        fixturePath(fixtureFlatAJSON),
+			expectedPath: fixturePath(expectedAADiff),
 		},
 		{
 			name:         "AB yaml",
-			pathA:        fixturePath("fileA.yml"),
-			pathB:        fixturePath("fileB.yml"),
-			expectedPath: fixturePath("expectedAB.diff"),
+			pathA:        fixturePath(fixtureAAYML),
+			pathB:        fixturePath(fixtureBYML),
+			expectedPath: fixturePath(expectedABDiff),
 		},
 		{
 			name:         "nested json files",
-			pathA:        fixturePath("fileE.json"),
-			pathB:        fixturePath("fileF.json"),
-			expectedPath: fixturePath("expectedEF.diff"),
+			pathA:        fixturePath(fixtureNestedAJSON),
+			pathB:        fixturePath(fixtureNestedBJSON),
+			expectedPath: fixturePath(expectedEFDiff),
 		},
 		{
 			name:         "GG same files",
-			pathA:        fixturePath("fileG.json"),
-			pathB:        fixturePath("fileG.json"),
-			expectedPath: fixturePath("expectedGG.diff"),
+			pathA:        fixturePath(fixtureSameAJSON),
+			pathB:        fixturePath(fixtureSameAJSON),
+			expectedPath: fixturePath(expectedGGDiff),
 		},
 		{
 			name:         "GH identical files",
-			pathA:        fixturePath("fileG.json"),
-			pathB:        fixturePath("fileH.json"),
-			expectedPath: fixturePath("expectedGH.diff"),
+			pathA:        fixturePath(fixtureSameAJSON),
+			pathB:        fixturePath(fixtureSameBJSON),
+			expectedPath: fixturePath(expectedGHDiff),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, _ := GenDiff(tt.pathA, tt.pathB, "stylish")
+			result, err := GenDiff(tt.pathA, tt.pathB, "stylish")
+			require.NoError(t, err)
 			actual := strings.TrimSpace(result)
 			expected := readFileToString(t, tt.expectedPath)
 
@@ -107,22 +131,21 @@ func TestGenDiffErrors(t *testing.T) {
 	}{
 		{
 			name:        "invalid first file",
-			pathA:       fixturePath("invalid.json"),
-			pathB:       fixturePath("fileA.json"),
+			pathA:       fixturePath(fixtureInvalidJSON),
+			pathB:       fixturePath(fixtureFlatAJSON),
 			format:      "stylish",
 			expectedErr: "",
 		},
 		{
 			name:        "invalid second file",
-			pathA:       fixturePath("fileA.json"),
-			pathB:       fixturePath("invalid.yaml"),
+			pathA:       fixturePath(fixtureFlatAJSON),
+			pathB:       fixturePath(fixtureInvalidYAML),
 			format:      "stylish",
 			expectedErr: "",
-		},
-		{
+		}, {
 			name:        "unsupported format",
-			pathA:       fixturePath("fileA.json"),
-			pathB:       fixturePath("fileB.json"),
+			pathA:       fixturePath(fixtureFlatAJSON),
+			pathB:       fixturePath(fixtureFlatBJSON),
 			format:      "xml",
 			expectedErr: "unsupported format: xml",
 		},

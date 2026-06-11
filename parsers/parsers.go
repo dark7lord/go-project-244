@@ -67,6 +67,6 @@ func Parse(path string) (any, error) {
 		value, err := parseYAML(fileBytes)
 		return value, parseError(path, ext, "parse", err)
 	default:
-		return nil, parseError(path, ext, "unsupported file type", ErrUnsupportedFileType)
+		return nil, fmt.Errorf("parser: path=%q type=%q: %w", path, ext, ErrUnsupportedFileType)
 	}
 }
