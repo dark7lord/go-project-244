@@ -72,6 +72,11 @@ func TestParse(t *testing.T) {
 
 			if tt.wantErr {
 				require.Error(t, err)
+				assert.Contains(t, err.Error(), "parser:")
+				assert.Contains(t, err.Error(), tt.path)
+				if tt.name == "unsupported file type" {
+					assert.True(t, errors.Is(err, ErrUnsupportedFileType))
+				}
 				return
 			}
 
