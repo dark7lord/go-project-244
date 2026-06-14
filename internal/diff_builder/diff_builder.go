@@ -8,7 +8,7 @@ import (
 
 	"github.com/samber/lo"
 
-	"code/diff"
+	"code/internal/diff"
 )
 
 // Types of differences between two files.

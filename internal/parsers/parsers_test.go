@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var fixtureDir = filepath.Join("..", "testdata", "gendiff", "fixture")
+var fixtureDir = filepath.Join("..", "..", "testdata", "gendiff", "fixture")
 
 func TestParse(t *testing.T) {
 	tests := []struct {

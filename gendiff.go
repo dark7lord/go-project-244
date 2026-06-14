@@ -4,9 +4,9 @@ package code
 import (
 	"fmt"
 
-	"code/diff_builder"
-	"code/formatters"
-	"code/parsers"
+	"code/internal/diff_builder"
+	"code/internal/formatters"
+	"code/internal/parsers"
 )
 
 // GenDiff function returns the difference between two structures as a string

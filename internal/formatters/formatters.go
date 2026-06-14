@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"slices"
 
-	"code/diff"
+	"code/internal/diff"
 )
 
 // PrintFormat type represents the format in which the difference between files can be printed

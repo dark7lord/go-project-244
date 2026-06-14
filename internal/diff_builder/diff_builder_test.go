@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"code/diff"
+	"code/internal/diff"
 )
 
 const (
@@ -134,6 +134,12 @@ func TestIsEqual(t *testing.T) {
 			name: "different map",
 			a:    map[string]any{"a": 1.0},
 			b:    map[string]any{"a": 2.0},
+			want: false,
+		},
+		{
+			name: "maps same length different keys",
+			a:    map[string]any{"a": 1.0, "b": 2.0},
+			b:    map[string]any{"a": 1.0, "c": 3.0},
 			want: false,
 		},
 		{

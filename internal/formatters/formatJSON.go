@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"code/diff"
+	"code/internal/diff"
 )
 
 func transformDiff(d diff.Node) any {

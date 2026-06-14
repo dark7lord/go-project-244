@@ -1,6 +1,6 @@
 package formatters_test
 
-import "code/diff"
+import "code/internal/diff"
 
 const (
 	testNameNestedAll      = "nested all types"

@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"code/diff"
-	"code/formatters"
+	"code/internal/diff"
+	"code/internal/formatters"
 )
 
 func TestFormatJSON(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	"code/diff"
+	"code/internal/diff"
 )
 
 func strSlice(slice []any, deep int) string {

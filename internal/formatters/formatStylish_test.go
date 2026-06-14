@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"code/diff"
-	"code/formatters"
+	"code/internal/diff"
+	"code/internal/formatters"
 )
 
 func TestFormatStylish(t *testing.T) {

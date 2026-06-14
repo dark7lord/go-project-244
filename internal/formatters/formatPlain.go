@@ -7,7 +7,7 @@ import (
 	// "slices"
 	"strings"
 
-	"code/diff"
+	"code/internal/diff"
 )
 
 func formatValue(value any) string {

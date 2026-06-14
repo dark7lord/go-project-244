@@ -8,8 +8,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
 
-	"code/diff"
-	"code/formatters"
+	"code/internal/diff"
+	"code/internal/formatters"
 )
 
 // readFileToString читает файл и возвращает обрезанную строку.
