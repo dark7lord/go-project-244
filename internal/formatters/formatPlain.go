@@ -3,8 +3,6 @@ package formatters
 import (
 	"fmt"
 	"slices"
-	// "maps"
-	// "slices"
 	"strings"
 
 	"code/internal/diff"

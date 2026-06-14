@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	testKey       = "key"
-	testNested    = "nested"
-	testArrayKey  = "arr"
+	testKey      = "key"
+	testNested   = "nested"
+	testArrayKey = "arr"
 )
 
 func nestedDiff(children ...diff.Node) diff.Node {

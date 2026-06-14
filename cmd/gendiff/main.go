@@ -34,10 +34,10 @@ func Run() error {
 
 			format := cmd.String("format")
 
-			filepathA := cmd.Args().Get(0)
-			filepathB := cmd.Args().Get(1)
+			pathOldFile := cmd.Args().Get(0)
+			pathNewFile := cmd.Args().Get(1)
 
-			diff, err := code.GenDiff(filepathA, filepathB, format)
+			diff, err := code.GenDiff(pathOldFile, pathNewFile, format)
 			if err != nil {
 				return err
 			}
