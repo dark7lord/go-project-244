@@ -11,13 +11,7 @@ import (
 	"code"
 )
 
-const (
-	binaryName  = "gendiff"
-	ExitOK      = 0
-	ExitGeneral = 1
-	ExitUsage   = 64
-	ExitDataErr = 65
-)
+const binaryName = "gendiff"
 
 func Run() error {
 	cmd := &cli.Command{

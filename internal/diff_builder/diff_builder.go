@@ -11,37 +11,47 @@ import (
 	"code/internal/diff"
 )
 
-// Types of differences between two files.
-const unknownType = "unknown type"
+// ValueKind represents the runtime type of a parsed JSON/YAML value.
+type ValueKind string
 
-func typeVar(value any) string {
+const (
+	Num     ValueKind = "num"
+	String  ValueKind = "string"
+	Bool    ValueKind = "bool"
+	Null    ValueKind = "null"
+	Map     ValueKind = "map"
+	Array   ValueKind = "array"
+	Unknown ValueKind = "unknown type"
+)
+
+func valueKind(value any) ValueKind {
 	switch value.(type) {
 	case float64, int:
-		return "num"
+		return Num
 	case string:
-		return "string"
+		return String
 	case bool:
-		return "bool"
+		return Bool
 	case nil:
-		return "null"
+		return Null
 	case map[string]any:
-		return "map"
+		return Map
 	case []any:
-		return "arr"
+		return Array
 	default:
-		return unknownType
+		return Unknown
 	}
 }
 
 func isEqual(a, b any) bool {
-	typeA := typeVar(a)
-	typeB := typeVar(b)
+	typeA := valueKind(a)
+	typeB := valueKind(b)
 
-	if typeA == unknownType || typeB == unknownType {
+	if typeA == Unknown || typeB == Unknown {
 		return false
 	}
 
-	if typeA == "arr" && typeB == typeA {
+	if typeA == Array && typeB == typeA {
 		sliceA := a.([]any)
 		sliceB := b.([]any)
 
@@ -58,7 +68,7 @@ func isEqual(a, b any) bool {
 		return true
 	}
 
-	if typeA == "map" && typeB == typeA {
+	if typeA == Map && typeB == typeA {
 		mapA := a.(map[string]any)
 		mapB := b.(map[string]any)
 
@@ -84,7 +94,7 @@ func isEqual(a, b any) bool {
 		return false
 	}
 
-	if typeA == "num" {
+	if typeA == Num {
 		return normalizeValue(a) == normalizeValue(b)
 	}
 
@@ -182,8 +192,8 @@ func RecursiveGendiff(dataA, dataB any) diff.Node {
 	}
 
 	typeDiff := diff.Unchanged
-	typeA := typeVar(dataA)
-	typeB := typeVar(dataB)
+	typeA := valueKind(dataA)
+	typeB := valueKind(dataB)
 
 	normA := normalizeValue(dataA)
 	normB := normalizeValue(dataB)

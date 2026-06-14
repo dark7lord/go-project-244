@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	testKey    = "key"
-	testNested = "nested"
-	testArr    = "arr"
+	testKey       = "key"
+	testNested    = "nested"
+	testArrayKey  = "arr"
 )
 
 func nestedDiff(children ...diff.Node) diff.Node {
@@ -80,11 +80,11 @@ func TestGenMapDiff(t *testing.T) {
 		},
 		{
 			name: "nested array",
-			mapA: map[string]any{testArr: []any{1.0, 2.0}},
-			mapB: map[string]any{testArr: []any{1.0, 3.0, 4.0}},
+			mapA: map[string]any{testArrayKey: []any{1.0, 2.0}},
+			mapB: map[string]any{testArrayKey: []any{1.0, 3.0, 4.0}},
 			want: nestedDiff(
 				diff.Node{
-					Key:      testArr,
+					Key:      testArrayKey,
 					TypeDiff: diff.Changed,
 					OldValue: []any{1.0, 2.0},
 					NewValue: []any{1.0, 3.0, 4.0},
@@ -169,15 +169,15 @@ func TestIsEqual(t *testing.T) {
 	}
 }
 
-func TestTypeVarAndNormalizeValue(t *testing.T) {
-	assert.Equal(t, "num", typeVar(1))
-	assert.Equal(t, "num", typeVar(1.0))
-	assert.Equal(t, "string", typeVar("text"))
-	assert.Equal(t, "bool", typeVar(false))
-	assert.Equal(t, "null", typeVar(nil))
-	assert.Equal(t, "map", typeVar(map[string]any{}))
-	assert.Equal(t, testArr, typeVar([]any{}))
-	assert.Equal(t, unknownType, typeVar(struct{}{}))
+func TestValueKindAndNormalizeValue(t *testing.T) {
+	assert.Equal(t, Num, valueKind(1))
+	assert.Equal(t, Num, valueKind(1.0))
+	assert.Equal(t, String, valueKind("text"))
+	assert.Equal(t, Bool, valueKind(false))
+	assert.Equal(t, Null, valueKind(nil))
+	assert.Equal(t, Map, valueKind(map[string]any{}))
+	assert.Equal(t, Array, valueKind([]any{}))
+	assert.Equal(t, Unknown, valueKind(struct{}{}))
 
 	assert.Equal(t, float64(1), normalizeValue(1))
 	assert.Equal(t, float64(1), normalizeValue(1.0))
