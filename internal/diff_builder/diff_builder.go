@@ -52,10 +52,9 @@ func isEqual(a, b diff.Value) bool {
 	case diff.Null:
 		_, ok := b.(diff.Null)
 		return ok
-
-	default:
-		return false
 	}
+
+	return false
 }
 
 func getDiffKeys(oldMap, newMap diff.Map) (removed, added, common []string) {
@@ -71,8 +70,6 @@ func getDiffKeys(oldMap, newMap diff.Map) (removed, added, common []string) {
 			removed = append(removed, k)
 		}
 	}
-
-	slices.Sort(common)
 
 	for k := range newMap {
 		if _, ok := oldMap[k]; !ok {

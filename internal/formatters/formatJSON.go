@@ -55,9 +55,8 @@ func transformDiff(d diff.Node) any {
 func formatJSON(df diff.Node) (string, error) {
 	cleaned := transformDiff(df)
 	jsonDiff, err := json.MarshalIndent(cleaned, "", "  ")
-
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("json marshal error: %w", err)
 	}
 
 	return string(jsonDiff), nil

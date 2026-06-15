@@ -47,10 +47,9 @@ func TestPrintDiff(t *testing.T) {
 	}
 
 	tests := []struct {
-		name    string
-		format  formatters.PrintFormat
-		want    string
-		wantErr bool
+		name   string
+		format formatters.PrintFormat
+		want   string
 	}{
 		{
 			name:   stylish,
@@ -67,23 +66,18 @@ func TestPrintDiff(t *testing.T) {
 			format: formatters.JSON,
 			want:   "{\n  \"Key [added]\": \"value\"\n}",
 		},
-		{
-			name:    "unsupported format",
-			format:  formatters.PrintFormat("xml"),
-			wantErr: true,
-		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := formatters.PrintDiff(testDiff, tt.format)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-
 			require.NoError(t, err)
 			require.Equal(t, tt.want, got)
 		})
 	}
+}
+
+func TestPrintDiffUnsupportedFormat(t *testing.T) {
+	_, err := formatters.PrintDiff(diff.Node{}, formatters.PrintFormat("xml"))
+	require.Error(t, err)
 }
