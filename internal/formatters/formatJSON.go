@@ -12,14 +12,14 @@ func transformDiff(d diff.Node) any {
 
 	switch d.TypeDiff {
 	case diff.Added:
-		return d.NewValue
+		return diff.ToNative(d.NewValue)
 	case diff.Removed:
-		return d.OldValue
+		return diff.ToNative(d.OldValue)
 	case diff.Changed:
-		result["[old value]"] = d.OldValue
-		result["[new value]"] = d.NewValue
+		result["[old value]"] = diff.ToNative(d.OldValue)
+		result["[new value]"] = diff.ToNative(d.NewValue)
 	case diff.Unchanged:
-		return d.OldValue
+		return diff.ToNative(d.OldValue)
 	case diff.Nested:
 		if len(d.Children) == 0 {
 			return result

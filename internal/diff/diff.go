@@ -17,7 +17,7 @@ const (
 type Node struct {
 	Key      string
 	TypeDiff Kind
-	OldValue any
-	NewValue any
+	OldValue Value
+	NewValue Value
 	Children []Node
 }

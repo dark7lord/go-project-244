@@ -3,142 +3,115 @@
 package diff_builder
 
 import (
-	"maps"
 	"slices"
-
-	"github.com/samber/lo"
 
 	"code/internal/diff"
 )
 
-// ValueKind represents the runtime type of a parsed JSON/YAML value.
-type ValueKind string
-
-const (
-	Num     ValueKind = "num"
-	String  ValueKind = "string"
-	Bool    ValueKind = "bool"
-	Null    ValueKind = "null"
-	Map     ValueKind = "map"
-	Array   ValueKind = "array"
-	Unknown ValueKind = "unknown type"
-)
-
-func valueKind(value any) ValueKind {
-	switch value.(type) {
-	case float64, int:
-		return Num
-	case string:
-		return String
-	case bool:
-		return Bool
-	case nil:
-		return Null
-	case map[string]any:
-		return Map
-	case []any:
-		return Array
-	default:
-		return Unknown
-	}
-}
-
-func isEqual(a, b any) bool {
-	typeA := valueKind(a)
-	typeB := valueKind(b)
-
-	if typeA == Unknown || typeB == Unknown {
-		return false
-	}
-
-	if typeA == Array && typeB == typeA {
-		sliceA := a.([]any)
-		sliceB := b.([]any)
-
-		if len(sliceA) != len(sliceB) {
+func isEqual(a, b diff.Value) bool {
+	switch va := a.(type) {
+	case diff.Slice:
+		vb, ok := b.(diff.Slice)
+		if !ok || len(va) != len(vb) {
 			return false
 		}
-
-		for i := range sliceA {
-			if !isEqual(sliceA[i], sliceB[i]) {
+		for i := range va {
+			if !isEqual(va[i], vb[i]) {
 				return false
 			}
 		}
 
 		return true
-	}
 
-	if typeA == Map && typeB == typeA {
-		mapA := a.(map[string]any)
-		mapB := b.(map[string]any)
-
-		if len(mapA) != len(mapB) {
+	case diff.Map:
+		vb, ok := b.(diff.Map)
+		if !ok || len(va) != len(vb) {
 			return false
 		}
-
-		for key, valueA := range mapA {
-			valueB, ok := mapB[key]
-			if !ok {
-				return false
-			}
-
-			if !isEqual(valueA, valueB) {
+		for key, valA := range va {
+			valB, exists := vb[key]
+			if !exists || !isEqual(valA, valB) {
 				return false
 			}
 		}
 
 		return true
-	}
 
-	if typeA != typeB {
+	case diff.Number:
+		vb, ok := b.(diff.Number)
+		return ok && va == vb
+
+	case diff.String:
+		vb, ok := b.(diff.String)
+		return ok && va == vb
+
+	case diff.Boolean:
+		vb, ok := b.(diff.Boolean)
+		return ok && va == vb
+
+	case diff.Null:
+		_, ok := b.(diff.Null)
+		return ok
+
+	default:
 		return false
 	}
-
-	if typeA == Num {
-		return normalizeValue(a) == normalizeValue(b)
-	}
-
-	return a == b
 }
 
-// yaml parser return int instead of float64
-func normalizeValue(value any) any {
-	switch v := value.(type) {
-	case int:
-		return float64(v)
-	default:
-		return value
+func getDiffKeys(oldMap, newMap diff.Map) (removed, added, common []string) {
+	lenA, lenB := len(oldMap), len(newMap)
+	removed = make([]string, 0, lenA)
+	added = make([]string, 0, lenB)
+	common = make([]string, 0, max(lenA, lenB))
+
+	for k := range oldMap {
+		if _, ok := newMap[k]; ok {
+			common = append(common, k)
+		} else {
+			removed = append(removed, k)
+		}
 	}
-}
 
-func genMapDiff(mapA, mapB map[string]any) diff.Node {
-	leftKeys := slices.Collect(maps.Keys(mapA))
-	rightKeys := slices.Collect(maps.Keys(mapB))
-
-	removed, added := lo.Difference(leftKeys, rightKeys)
-	common := lo.Union(leftKeys, rightKeys)
 	slices.Sort(common)
 
-	nodes := make([]diff.Node, len(common))
-
-	for i, key := range common {
-		node := diff.Node{
-			Key:      key,
-			TypeDiff: diff.Unchanged,
+	for k := range newMap {
+		if _, ok := oldMap[k]; !ok {
+			added = append(added, k)
 		}
+	}
+
+	return removed, added, common
+}
+
+func genMapDiff(mapA, mapB diff.Map) diff.Node {
+	removed, added, common := getDiffKeys(mapA, mapB)
+	allKeys := append(append(removed, added...), common...)
+	slices.Sort(allKeys)
+
+	nodes := make([]diff.Node, 0, len(allKeys))
+
+	for _, key := range allKeys {
+		_, inA := mapA[key]
+		_, inB := mapB[key]
 
 		switch {
-		case slices.Contains(removed, key):
-			node.TypeDiff = diff.Removed
-			node.OldValue = mapA[key]
-		case slices.Contains(added, key):
-			node.TypeDiff = diff.Added
-			node.NewValue = mapB[key]
+		case inA && !inB:
+			nodes = append(nodes, diff.Node{
+				Key:      key,
+				TypeDiff: diff.Removed,
+				OldValue: mapA[key],
+			})
+		case !inA && inB:
+			nodes = append(nodes, diff.Node{
+				Key:      key,
+				TypeDiff: diff.Added,
+				NewValue: mapB[key],
+			})
 		default:
 			leftValue := mapA[key]
 			rightValue := mapB[key]
 
-			node = RecursiveGendiff(leftValue, rightValue)
+			node := RecursiveGendiff(leftValue, rightValue)
 			node.Key = key
 
 			if !isEqual(leftValue, rightValue) {
@@ -150,24 +123,22 @@ func genMapDiff(mapA, mapB map[string]any) diff.Node {
 
 				node.TypeDiff = typeDiff
 			}
-		}
 
-		nodes[i] = node
+			nodes = append(nodes, node)
+		}
 	}
 
-	resultNode := diff.Node{
+	return diff.Node{
 		TypeDiff: diff.Nested,
 		Children: nodes,
 	}
-
-	return resultNode
 }
 
 // BuildDiff function builds a Diff struct based on the type of difference and the old and new values
-func BuildDiff(typeDiff diff.Kind, oldValue, newValue any) diff.Node {
+func BuildDiff(typeDiff diff.Kind, oldValue, newValue diff.Value) diff.Node {
 	result := diff.Node{
 		TypeDiff: typeDiff,
-		OldValue: normalizeValue(oldValue),
+		OldValue: oldValue,
 	}
 
 	if typeDiff == diff.Added {
@@ -175,7 +146,7 @@ func BuildDiff(typeDiff diff.Kind, oldValue, newValue any) diff.Node {
 	}
 
 	if typeDiff == diff.Added || typeDiff == diff.Changed {
-		result.NewValue = normalizeValue(newValue)
+		result.NewValue = newValue
 	}
 
 	return result
@@ -183,24 +154,19 @@ func BuildDiff(typeDiff diff.Kind, oldValue, newValue any) diff.Node {
 
 // RecursiveGendiff function recursively generates a diff between two data structures,
 // which can be maps or slices, and returns the resulting diff structure
-func RecursiveGendiff(dataA, dataB any) diff.Node {
-	mapA, isAMap := dataA.(map[string]any)
-	mapB, isBmap := dataB.(map[string]any)
+func RecursiveGendiff(dataA, dataB diff.Value) diff.Node {
+	mapA, isAMap := dataA.(diff.Map)
+	mapB, isBmap := dataB.(diff.Map)
 
 	if isAMap && isBmap {
 		return genMapDiff(mapA, mapB)
 	}
 
 	typeDiff := diff.Unchanged
-	typeA := valueKind(dataA)
-	typeB := valueKind(dataB)
 
-	normA := normalizeValue(dataA)
-	normB := normalizeValue(dataB)
-
-	if typeA != typeB || !isEqual(normA, normB) {
+	if !isEqual(dataA, dataB) {
 		typeDiff = diff.Changed
 	}
 
-	return BuildDiff(typeDiff, normA, normB)
+	return BuildDiff(typeDiff, dataA, dataB)
 }

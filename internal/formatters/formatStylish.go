@@ -96,18 +96,18 @@ func formatStylish(df diff.Node, deep int) string {
 
 	switch df.TypeDiff {
 	case diff.Unchanged:
-		writeKeyValue("  ", df.Key, df.OldValue)
+		writeKeyValue("  ", df.Key, diff.ToNative(df.OldValue))
 
 	case diff.Removed:
-		writeKeyValue("- ", df.Key, df.OldValue)
+		writeKeyValue("- ", df.Key, diff.ToNative(df.OldValue))
 
 	case diff.Added:
-		writeKeyValue("+ ", df.Key, df.NewValue)
+		writeKeyValue("+ ", df.Key, diff.ToNative(df.NewValue))
 
 	case diff.Changed:
-		writeKeyValue("- ", df.Key, df.OldValue)
+		writeKeyValue("- ", df.Key, diff.ToNative(df.OldValue))
 		builder.WriteByte('\n')
-		writeKeyValue("+ ", df.Key, df.NewValue)
+		writeKeyValue("+ ", df.Key, diff.ToNative(df.NewValue))
 
 	case diff.Nested:
 		if deep > 0 {

@@ -9,29 +9,31 @@ import (
 	"path/filepath"
 
 	"gopkg.in/yaml.v3"
+
+	"code/internal/diff"
 )
 
 // ErrUnsupportedFileType is returned when the file type is not supported
 var ErrUnsupportedFileType = errors.New("unsupported file type")
 
-func parseJSON(data []byte) (any, error) {
+func parseJSON(data []byte) (diff.Value, error) {
 	var result any
 
 	if err := json.Unmarshal(data, &result); err != nil {
 		return nil, err
 	}
 
-	return result, nil
+	return diff.ToValue(result), nil
 }
 
-func parseYAML(data []byte) (any, error) {
+func parseYAML(data []byte) (diff.Value, error) {
 	var result any
 
 	if err := yaml.Unmarshal(data, &result); err != nil {
 		return nil, err
 	}
 
-	return result, nil
+	return diff.ToValue(result), nil
 }
 
 func parseError(path, ext, op string, err error) error {
@@ -39,11 +41,11 @@ func parseError(path, ext, op string, err error) error {
 		return nil
 	}
 
-	return fmt.Errorf("parser: path=%q type=%q %s: %w", path, ext, op, err)
+	return fmt.Errorf("parse error: path=%q type=%q %s: %w", path, ext, op, err)
 }
 
 // Parse function returns a json-like structure
-func Parse(path string) (any, error) {
+func Parse(path string) (diff.Value, error) {
 	ext := filepath.Ext(path)
 
 	fileInfo, err := os.Stat(path)
@@ -52,7 +54,11 @@ func Parse(path string) (any, error) {
 	}
 
 	if fileInfo.IsDir() {
-		return nil, fmt.Errorf("parser: path=%q type=%q is directory", path, ext)
+		return nil, fmt.Errorf("parse error: path=%q is directory", path)
+	}
+
+	if ext == "" {
+		return nil, fmt.Errorf("parse error: in path=%q missing file extension", path)
 	}
 
 	fileBytes, err := os.ReadFile(path)
