@@ -24,10 +24,13 @@ run: build
 cover:
 	go test ./... -coverprofile=coverage.out
 	go tool cover -func=coverage.out
-#	go tool cover -html=coverage.out
+
+cover-html: cover
+	go tool cover -html=coverage.out
 
 clean:
 	rm -f $(BIN)
+	rm -f coverage.out
 
 
 .PHONY: test fmt lint-fix lint build cover clean run
