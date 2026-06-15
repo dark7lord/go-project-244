@@ -17,7 +17,7 @@ func TestFormatPlainNoTrailingNewline(t *testing.T) {
 			{
 				Key:      "addedKey",
 				TypeDiff: diff.Added,
-				NewValue: "added value",
+				NewValue: diff.String("added value"),
 			},
 		},
 	}
@@ -49,7 +49,7 @@ func TestFormatPlain(t *testing.T) {
 			diff: diff.Node{
 				TypeDiff: diff.Nested,
 				Children: []diff.Node{
-					{Key: "complexKey", TypeDiff: diff.Added, NewValue: []any{1.0, 2.0}},
+					{Key: "complexKey", TypeDiff: diff.Added, NewValue: diff.Slice{diff.Number(1), diff.Number(2)}},
 				},
 			},
 			want: "Property 'complexKey' was added with value: [complex value]",
@@ -59,7 +59,7 @@ func TestFormatPlain(t *testing.T) {
 			diff: diff.Node{
 				TypeDiff: diff.Nested,
 				Children: []diff.Node{
-					{Key: "nullKey", TypeDiff: diff.Added, NewValue: nil},
+					{Key: "nullKey", TypeDiff: diff.Added, NewValue: diff.Null{}},
 				},
 			},
 			want: "Property 'nullKey' was added with value: null",
@@ -69,7 +69,7 @@ func TestFormatPlain(t *testing.T) {
 			diff: diff.Node{
 				TypeDiff: diff.Nested,
 				Children: []diff.Node{
-					{Key: "boolKey", TypeDiff: diff.Added, NewValue: true},
+					{Key: "boolKey", TypeDiff: diff.Added, NewValue: diff.Boolean(true)},
 				},
 			},
 			want: "Property 'boolKey' was added with value: true",

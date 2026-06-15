@@ -11,13 +11,13 @@ const (
 var flatDiffAll = diff.Node{
 	TypeDiff: diff.Nested,
 	Children: []diff.Node{
-		{Key: "stringKey", TypeDiff: diff.Unchanged, OldValue: "string value"},
-		{Key: "numberKey", TypeDiff: diff.Unchanged, OldValue: 42.0},
-		{Key: "boolKey", TypeDiff: diff.Unchanged, OldValue: true},
-		{Key: "nullKey", TypeDiff: diff.Unchanged, OldValue: nil},
-		{Key: "addedKey", TypeDiff: diff.Added, NewValue: "added value"},
-		{Key: "removedKey", TypeDiff: diff.Removed, OldValue: "removed value"},
-		{Key: "changedKey", TypeDiff: diff.Changed, OldValue: "old value", NewValue: "new value"},
+		{Key: "stringKey", TypeDiff: diff.Unchanged, OldValue: diff.String("string value")},
+		{Key: "numberKey", TypeDiff: diff.Unchanged, OldValue: diff.Number(42)},
+		{Key: "boolKey", TypeDiff: diff.Unchanged, OldValue: diff.Boolean(true)},
+		{Key: "nullKey", TypeDiff: diff.Unchanged, OldValue: diff.Null{}},
+		{Key: "addedKey", TypeDiff: diff.Added, NewValue: diff.String("added value")},
+		{Key: "removedKey", TypeDiff: diff.Removed, OldValue: diff.String("removed value")},
+		{Key: "changedKey", TypeDiff: diff.Changed, OldValue: diff.String("old value"), NewValue: diff.String("new value")},
 	},
 }
 
@@ -27,7 +27,7 @@ var nestedDiffAll = diff.Node{
 		{
 			Key:      "outerUnchanged",
 			TypeDiff: diff.Unchanged,
-			OldValue: "value1",
+			OldValue: diff.String("value1"),
 		},
 		{
 			Key:      "outerNested",
@@ -36,17 +36,17 @@ var nestedDiffAll = diff.Node{
 				{
 					Key:      "nestedUnchanged",
 					TypeDiff: diff.Unchanged,
-					OldValue: "nestedValue",
+					OldValue: diff.String("nestedValue"),
 				},
 				{
 					Key:      "nestedAdded",
 					TypeDiff: diff.Added,
-					NewValue: "addedNestedValue",
+					NewValue: diff.String("addedNestedValue"),
 				},
 				{
 					Key:      "nestedRemoved",
 					TypeDiff: diff.Removed,
-					OldValue: "removedNestedValue",
+					OldValue: diff.String("removedNestedValue"),
 				},
 				{
 					Key:      "nestedDeep",
@@ -55,8 +55,8 @@ var nestedDiffAll = diff.Node{
 						{
 							Key:      "deepChanged",
 							TypeDiff: diff.Changed,
-							OldValue: "oldDeepValue",
-							NewValue: "newDeepValue",
+							OldValue: diff.String("oldDeepValue"),
+							NewValue: diff.String("newDeepValue"),
 						},
 					},
 				},
@@ -65,18 +65,18 @@ var nestedDiffAll = diff.Node{
 		{
 			Key:      "outerAdded",
 			TypeDiff: diff.Added,
-			NewValue: map[string]any{"addedNestedKey": "addedNestedValue"},
+			NewValue: diff.Map{"addedNestedKey": diff.String("addedNestedValue")},
 		},
 		{
 			Key:      "outerRemoved",
 			TypeDiff: diff.Removed,
-			OldValue: map[string]any{"removedNestedKey": "removedNestedValue"},
+			OldValue: diff.Map{"removedNestedKey": diff.String("removedNestedValue")},
 		},
 		{
 			Key:      "outerChanged",
 			TypeDiff: diff.Changed,
-			OldValue: map[string]any{"oldNestedKey": "oldNestedValue"},
-			NewValue: map[string]any{"newNestedKey": "newNestedValue"},
+			OldValue: diff.Map{"oldNestedKey": diff.String("oldNestedValue")},
+			NewValue: diff.Map{"newNestedKey": diff.String("newNestedValue")},
 		},
 	},
 }

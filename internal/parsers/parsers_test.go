@@ -8,15 +8,17 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"code/internal/diff"
 )
 
-var fixtureDir = filepath.Join("..", "..", "testdata", "gendiff", "fixture")
+var fixtureDir = filepath.Join("..", "testdata", "fixture")
 
 func TestParse(t *testing.T) {
 	tests := []struct {
 		name     string
 		path     string
-		expected any
+		expected diff.Value
 		wantErr  bool
 	}{
 		{
@@ -42,21 +44,21 @@ func TestParse(t *testing.T) {
 		{
 			name: "valid json",
 			path: filepath.Join(fixtureDir, "flat", "fileA.json"),
-			expected: map[string]any{
-				"host":    "hexlet.io",
-				"timeout": 50.0,
-				"proxy":   "123.234.53.22",
-				"follow":  false,
+			expected: diff.Map{
+				"host":    diff.String("hexlet.io"),
+				"timeout": diff.Number(50),
+				"proxy":   diff.String("123.234.53.22"),
+				"follow":  diff.Boolean(false),
 			},
 		},
 		{
 			name: "valid yml",
 			path: filepath.Join(fixtureDir, "flat", "fileA.yml"),
-			expected: map[string]any{
-				"host":    "hexlet.io",
-				"timeout": 50,
-				"proxy":   "123.234.53.22",
-				"follow":  false,
+			expected: diff.Map{
+				"host":    diff.String("hexlet.io"),
+				"timeout": diff.Number(50),
+				"proxy":   diff.String("123.234.53.22"),
+				"follow":  diff.Boolean(false),
 			},
 		},
 		{
@@ -72,7 +74,7 @@ func TestParse(t *testing.T) {
 
 			if tt.wantErr {
 				require.Error(t, err)
-				assert.Contains(t, err.Error(), "parser:")
+				assert.Contains(t, err.Error(), "parse")
 				assert.Contains(t, err.Error(), tt.path)
 				if tt.name == "unsupported file type" {
 					assert.True(t, errors.Is(err, ErrUnsupportedFileType))

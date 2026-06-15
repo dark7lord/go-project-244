@@ -41,7 +41,7 @@ func TestPrintDiff(t *testing.T) {
 			{
 				Key:      "Key",
 				TypeDiff: diff.Added,
-				NewValue: "value",
+				NewValue: diff.String("value"),
 			},
 		},
 	}

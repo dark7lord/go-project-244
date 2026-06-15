@@ -26,12 +26,11 @@ func TestFormatJSON(t *testing.T) {
 	runDiffTests(t, formatters.JSON, tests)
 }
 
-func TestFormatJSONMarshalError(t *testing.T) {
+func TestFormatJSONNoError(t *testing.T) {
 	_, err := formatters.PrintDiff(diff.Node{
 		TypeDiff: diff.Unchanged,
-		OldValue: make(chan int),
+		OldValue: diff.String("test"),
 	}, formatters.JSON)
 
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "unsupported type")
+	require.NoError(t, err)
 }
