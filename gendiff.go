@@ -1,5 +1,5 @@
-// Package gendiff provides functions for getting the difference between files
-package gendiff
+// Package code provides functions for getting the difference between files
+package code
 
 import (
 	"fmt"

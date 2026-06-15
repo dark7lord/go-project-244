@@ -15,7 +15,7 @@ func TestFormatJSON(t *testing.T) {
 		{
 			name: testNameNestedAll,
 			diff: nestedDiffAll,
-			path: filepath.Join("testdata", "fixture", "jsonNested.json"),
+			path: filepath.Join("testdata", "fixtures", "jsonNested.json"),
 		},
 		{
 			name: testNameEmptyNested,

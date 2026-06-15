@@ -29,12 +29,12 @@ func TestFormatStylish(t *testing.T) {
 		{
 			name: "flat all types",
 			diff: flatDiffAll,
-			path: filepath.Join("testdata", "fixture", "flatMap.diff"),
+			path: filepath.Join("testdata", "fixtures", "flatMap.diff"),
 		},
 		{
 			name: testNameNestedAll,
 			diff: nestedDiffAll,
-			path: filepath.Join("testdata", "fixture", "nestedMap.diff"),
+			path: filepath.Join("testdata", "fixtures", "nestedMap.diff"),
 		},
 		{
 			name: testNameEmptyNested,

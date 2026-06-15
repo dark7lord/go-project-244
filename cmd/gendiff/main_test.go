@@ -13,8 +13,8 @@ import (
 func TestRunSuccess(t *testing.T) {
 	err := run([]string{
 		binaryName,
-		filepath.Join("..", "..", "internal", "testdata", "fixture", "flat", "fileA.json"),
-		filepath.Join("..", "..", "internal", "testdata", "fixture", "flat", "fileB.json"),
+		filepath.Join("..", "..", "testdata", "fixtures", "flat", "fileA.json"),
+		filepath.Join("..", "..", "testdata", "fixtures", "flat", "fileB.json"),
 	})
 	require.NoError(t, err)
 }

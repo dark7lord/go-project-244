@@ -8,7 +8,7 @@ import (
 
 	"github.com/urfave/cli/v3"
 
-	"code/internal/gendiff"
+	"code"
 )
 
 const binaryName = "gendiff"
@@ -36,7 +36,7 @@ func run(args []string) error {
 			pathOldFile := cmd.Args().Get(0)
 			pathNewFile := cmd.Args().Get(1)
 
-			diff, err := gendiff.GenDiff(pathOldFile, pathNewFile, format)
+			diff, err := code.GenDiff(pathOldFile, pathNewFile, format)
 			if err != nil {
 				return err
 			}

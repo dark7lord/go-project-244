@@ -1,4 +1,4 @@
-package gendiff
+package code
 
 import (
 	"os"
@@ -43,7 +43,7 @@ const (
 )
 
 func fixturePath(name string) string {
-	return filepath.Join("..", "testdata", "fixture", name)
+	return filepath.Join("testdata", "fixtures", name)
 }
 
 func TestGendiff(t *testing.T) {

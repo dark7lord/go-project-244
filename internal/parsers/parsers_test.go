@@ -12,7 +12,7 @@ import (
 	"code/internal/diff"
 )
 
-var fixtureDir = filepath.Join("..", "testdata", "fixture")
+var fixtureDir = filepath.Join("..", "..", "testdata", "fixtures")
 
 func TestParse(t *testing.T) {
 	tests := []struct {

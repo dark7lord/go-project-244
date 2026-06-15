@@ -32,12 +32,12 @@ func TestFormatPlain(t *testing.T) {
 		{
 			name: "flat all types",
 			diff: flatDiffAll,
-			path: filepath.Join("testdata", "fixture", "plainFlat.txt"),
+			path: filepath.Join("testdata", "fixtures", "plainFlat.txt"),
 		},
 		{
 			name: testNameNestedAll,
 			diff: nestedDiffAll,
-			path: filepath.Join("testdata", "fixture", "plainNested.txt"),
+			path: filepath.Join("testdata", "fixtures", "plainNested.txt"),
 		},
 		{
 			name: testNameEmptyNested,
