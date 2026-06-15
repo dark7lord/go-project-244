@@ -8,12 +8,12 @@ import (
 
 	"github.com/urfave/cli/v3"
 
-	"code"
+	"code/internal/gendiff"
 )
 
 const binaryName = "gendiff"
 
-func Run() error {
+func run(args []string) error {
 	cmd := &cli.Command{
 		Name:                  binaryName,
 		Usage:                 "Compares two configuration files and shows a difference.",
@@ -33,11 +33,10 @@ func Run() error {
 			}
 
 			format := cmd.String("format")
-
 			pathOldFile := cmd.Args().Get(0)
 			pathNewFile := cmd.Args().Get(1)
 
-			diff, err := code.GenDiff(pathOldFile, pathNewFile, format)
+			diff, err := gendiff.GenDiff(pathOldFile, pathNewFile, format)
 			if err != nil {
 				return err
 			}
@@ -48,11 +47,11 @@ func Run() error {
 		},
 	}
 
-	return cmd.Run(context.Background(), os.Args)
+	return cmd.Run(context.Background(), args)
 }
 
 func main() {
-	if err := Run(); err != nil {
+	if err := run(os.Args); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

@@ -11,46 +11,22 @@ import (
 )
 
 func TestRunSuccess(t *testing.T) {
-	oldArgs := os.Args
-	defer func() { os.Args = oldArgs }()
-
-	os.Args = []string{
+	err := run([]string{
 		binaryName,
-		filepath.Join("..", "..", "testdata", "gendiff", "fixture", "flat", "fileA.json"),
-		filepath.Join("..", "..", "testdata", "gendiff", "fixture", "flat", "fileB.json"),
-	}
-
-	err := Run()
-	if err != nil {
-		t.Fatalf("expected no error, got %v", err)
-	}
+		filepath.Join("..", "..", "internal", "testdata", "fixture", "flat", "fileA.json"),
+		filepath.Join("..", "..", "internal", "testdata", "fixture", "flat", "fileB.json"),
+	})
+	require.NoError(t, err)
 }
 
 func TestRunInvalidArgs(t *testing.T) {
-	oldArgs := os.Args
-	defer func() { os.Args = oldArgs }()
-	os.Args = []string{binaryName, "fileA.json"}
-
-	err := Run()
-	if err == nil {
-		t.Fatal("expected error for invalid args count, got nil")
-	}
-
-	expected := "expected 2 file paths, got 1"
-	if err.Error() != expected {
-		t.Fatalf("expected %q, got %q", expected, err.Error())
-	}
+	err := run([]string{binaryName, "fileA.json"})
+	require.EqualError(t, err, "expected 2 file paths, got 1")
 }
 
 func TestRunGenDiffError(t *testing.T) {
-	oldArgs := os.Args
-	defer func() { os.Args = oldArgs }()
-	os.Args = []string{binaryName, "nonexistent.json", "alsonothere.json"}
-
-	err := Run()
-	if err == nil {
-		t.Fatal("expected error for nonexistent file, got nil")
-	}
+	err := run([]string{binaryName, "nonexistent.json", "alsonothere.json"})
+	require.Error(t, err)
 }
 
 func TestMainError(t *testing.T) {
