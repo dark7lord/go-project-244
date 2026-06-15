@@ -169,6 +169,11 @@ func TestIsEqual(t *testing.T) {
 	}
 }
 
+func TestIsEqualUnreachable(t *testing.T) {
+	v := diff.UnknownValue()
+	assert.False(t, isEqual(v, v))
+}
+
 func TestBuildDiff(t *testing.T) {
 	assert.Equal(t,
 		diff.Node{TypeDiff: diff.Added, OldValue: nil, NewValue: diff.Number(1)},

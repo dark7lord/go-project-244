@@ -1,6 +1,7 @@
 package formatters_test
 
 import (
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -80,4 +81,15 @@ func TestPrintDiff(t *testing.T) {
 func TestPrintDiffUnsupportedFormat(t *testing.T) {
 	_, err := formatters.PrintDiff(diff.Node{}, formatters.PrintFormat("xml"))
 	require.Error(t, err)
+}
+
+func TestFormatJSONMarshalError(t *testing.T) {
+	node := diff.Node{
+		TypeDiff: diff.Added,
+		NewValue: diff.Number(math.NaN()),
+	}
+
+	_, err := formatters.PrintDiff(node, formatters.JSON)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "json marshal error")
 }

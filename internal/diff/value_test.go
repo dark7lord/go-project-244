@@ -128,10 +128,15 @@ func TestToValue(t *testing.T) {
 	}
 }
 
-type testUnknownValue struct{}
-
-func (testUnknownValue) isValue() {}
-
 func TestToNativeDefault(t *testing.T) {
-	assert.Equal(t, nil, ToNative(testUnknownValue{}))
+	assert.Equal(t, nil, ToNative(UnknownValue()))
+}
+
+func TestIsValueMarkers(t *testing.T) {
+	assert.NotPanics(t, func() { Map{}.isValue() })
+	assert.NotPanics(t, func() { Slice{}.isValue() })
+	assert.NotPanics(t, func() { Number(0).isValue() })
+	assert.NotPanics(t, func() { String("").isValue() })
+	assert.NotPanics(t, func() { Boolean(false).isValue() })
+	assert.NotPanics(t, func() { Null{}.isValue() })
 }

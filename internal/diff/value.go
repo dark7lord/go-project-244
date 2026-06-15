@@ -91,3 +91,12 @@ func ToNative(v Value) any {
 		return nil
 	}
 }
+
+// unknownValue satisfies the sealed Value interface for testing
+// default branches in type switches.
+type unknownValue struct{}
+
+func (unknownValue) isValue() {}
+
+// UnknownValue returns a Value that is not one of the standard types.
+func UnknownValue() Value { return unknownValue{} }
