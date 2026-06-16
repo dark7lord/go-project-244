@@ -3,6 +3,12 @@ BIN := bin/gendiff
 build:
 	go build -o $(BIN) ./cmd/gendiff/main.go
 
+install:
+	go install ./cmd/gendiff
+
+uninstall:
+	go clean -i ./cmd/gendiff
+
 lint:
 	golangci-lint run
 
@@ -32,5 +38,4 @@ clean:
 	rm -f $(BIN)
 	rm -f coverage.out
 
-
-.PHONY: test fmt lint-fix lint build cover clean run
+.PHONY: install uninstall test fmt lint-fix lint build cover cover-html clean run 
