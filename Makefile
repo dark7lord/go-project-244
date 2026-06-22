@@ -34,8 +34,11 @@ cover:
 cover-html: cover
 	go tool cover -html=coverage.out
 
+check: test lint build clean
+	@echo "✅ All checks passed"
+
 clean:
 	rm -f $(BIN)
 	rm -f coverage.out
 
-.PHONY: install uninstall test fmt lint-fix lint build cover cover-html clean run 
+.PHONY: install uninstall test fmt lint-fix lint build cover cover-html clean run check 
