@@ -31,7 +31,6 @@ export PATH=$PATH:$(go env GOPATH)/bin
 
 ```bash
 make build
-go build -o gendiff ./cmd/gendiff/
 ```
 
 ### Uninstall
@@ -65,6 +64,8 @@ gendiff --format json fileA.json fileB.json
 ```
 
 ## Examples
+
+*All examples run from the project root. Test files are in `testdata/fixtures/`.*
 
 ### Flat files
 
@@ -162,7 +163,7 @@ gendiff --format json fileA.json fileB.json
 
 #### YAML
 
-Same output as JSON stylish, with `.yml` input files:
+Same tree output as stylish, with `.yml` input files:
 
 ```bash
 gendiff fileA.yml fileB.yml
@@ -410,6 +411,7 @@ gendiff --format json fileE.json fileF.json
 make test       # run all tests
 make lint       # run linters
 make cover      # run tests with coverage report
+make check      # test + lint + build + clean
 make build      # build binary to bin/gendiff
 make clean      # remove build artifacts
 ```
