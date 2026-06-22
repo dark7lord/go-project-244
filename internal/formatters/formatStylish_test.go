@@ -14,7 +14,7 @@ func TestFormatStylish(t *testing.T) {
 			name: "primitive",
 			diff: diff.Node{
 				TypeDiff: diff.Unchanged,
-				OldValue: diff.String(testNamePrimitiveValue),
+				OldValue: testNamePrimitiveValue,
 			},
 			want: testNamePrimitiveValue,
 		},
@@ -22,7 +22,7 @@ func TestFormatStylish(t *testing.T) {
 			name: "null",
 			diff: diff.Node{
 				TypeDiff: diff.Unchanged,
-				OldValue: diff.Null{},
+				OldValue: nil,
 			},
 			want: "null",
 		},
@@ -46,7 +46,7 @@ func TestFormatStylish(t *testing.T) {
 			diff: diff.Node{
 				TypeDiff: diff.Nested,
 				Children: []diff.Node{
-					{Key: "arr", TypeDiff: diff.Added, NewValue: diff.Slice{}},
+					{Key: "arr", TypeDiff: diff.Added, NewValue: []any{}},
 				},
 			},
 			want: "{\n  + arr: []\n}",
@@ -59,7 +59,7 @@ func TestFormatStylish(t *testing.T) {
 					{
 						Key:      "obj",
 						TypeDiff: diff.Added,
-						NewValue: diff.Map{},
+						NewValue: map[string]any{},
 					},
 				},
 			},
@@ -73,7 +73,7 @@ func TestFormatStylish(t *testing.T) {
 					{
 						Key:      "arr",
 						TypeDiff: diff.Added,
-						NewValue: diff.Slice{diff.String("x")},
+						NewValue: []any{"x"},
 					},
 				},
 			},

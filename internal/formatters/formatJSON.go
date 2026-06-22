@@ -52,29 +52,29 @@ func flattenDiff(df diff.Node, path []string) []any {
 		return []any{addedEntry{
 			Key:   key,
 			Type:  "added",
-			Value: diff.ToNative(df.NewValue),
+			Value: df.NewValue,
 		}}
 
 	case diff.Removed:
 		return []any{removedEntry{
 			Key:   key,
 			Type:  "removed",
-			Value: diff.ToNative(df.OldValue),
+			Value: df.OldValue,
 		}}
 
 	case diff.Changed:
 		return []any{changedEntry{
 			Key:      key,
 			Type:     "changed",
-			OldValue: diff.ToNative(df.OldValue),
-			NewValue: diff.ToNative(df.NewValue),
+			OldValue: df.OldValue,
+			NewValue: df.NewValue,
 		}}
 
 	case diff.Unchanged:
 		return []any{unchangedEntry{
 			Key:   key,
 			Type:  "unchanged",
-			Value: diff.ToNative(df.OldValue),
+			Value: df.OldValue,
 		}}
 	}
 

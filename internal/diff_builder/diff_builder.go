@@ -96,13 +96,13 @@ func genMapDiff(oldMap, newMap diff.Map) diff.Node {
 			nodes = append(nodes, diff.Node{
 				Key:      key,
 				TypeDiff: diff.Removed,
-				OldValue: oldMap[key],
+				OldValue: diff.ToNative(oldMap[key]),
 			})
 		case !inOld && inNew:
 			nodes = append(nodes, diff.Node{
 				Key:      key,
 				TypeDiff: diff.Added,
-				NewValue: newMap[key],
+				NewValue: diff.ToNative(newMap[key]),
 			})
 		default:
 			oldVal := oldMap[key]
@@ -134,7 +134,7 @@ func genMapDiff(oldMap, newMap diff.Map) diff.Node {
 func buildDiff(typeDiff diff.Kind, oldValue, newValue diff.Value) diff.Node {
 	result := diff.Node{
 		TypeDiff: typeDiff,
-		OldValue: oldValue,
+		OldValue: diff.ToNative(oldValue),
 	}
 
 	if typeDiff == diff.Added {
@@ -142,7 +142,7 @@ func buildDiff(typeDiff diff.Kind, oldValue, newValue diff.Value) diff.Node {
 	}
 
 	if typeDiff == diff.Added || typeDiff == diff.Changed {
-		result.NewValue = newValue
+		result.NewValue = diff.ToNative(newValue)
 	}
 
 	return result

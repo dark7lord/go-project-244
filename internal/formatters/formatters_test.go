@@ -42,7 +42,7 @@ func TestPrintDiff(t *testing.T) {
 			{
 				Key:      "Key",
 				TypeDiff: diff.Added,
-				NewValue: diff.String("value"),
+				NewValue: "value",
 			},
 		},
 	}
@@ -85,7 +85,7 @@ func TestFormat(t *testing.T) {
 			{
 				Key:      "Key",
 				TypeDiff: diff.Added,
-				NewValue: diff.String("value"),
+				NewValue: "value",
 			},
 		},
 	}
@@ -122,7 +122,7 @@ func TestPrintDiffUnsupportedFormat(t *testing.T) {
 func TestFormatJSONMarshalError(t *testing.T) {
 	node := diff.Node{
 		TypeDiff: diff.Added,
-		NewValue: diff.Number(math.NaN()),
+		NewValue: math.NaN(),
 	}
 
 	_, err := formatters.PrintDiff(node, formatters.JSON)

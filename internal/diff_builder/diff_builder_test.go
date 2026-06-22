@@ -33,7 +33,7 @@ func TestGenMapDiff(t *testing.T) {
 			mapA: diff.Map{},
 			mapB: diff.Map{testKey: diff.Number(42)},
 			want: nestedDiff(
-				diff.Node{Key: testKey, TypeDiff: diff.Added, NewValue: diff.Number(42)},
+				diff.Node{Key: testKey, TypeDiff: diff.Added, NewValue: 42.0},
 			),
 		},
 		{
@@ -42,7 +42,7 @@ func TestGenMapDiff(t *testing.T) {
 			mapB: diff.Map{},
 			want: nestedDiff(
 				diff.Node{
-					Key: testKey, TypeDiff: diff.Removed, OldValue: diff.String("value")},
+					Key: testKey, TypeDiff: diff.Removed, OldValue: "value"},
 			),
 		},
 		{
@@ -51,7 +51,7 @@ func TestGenMapDiff(t *testing.T) {
 			mapB: diff.Map{testKey: diff.Boolean(false)},
 			want: nestedDiff(
 				diff.Node{
-					Key: testKey, TypeDiff: diff.Changed, OldValue: diff.Boolean(true), NewValue: diff.Boolean(false)},
+					Key: testKey, TypeDiff: diff.Changed, OldValue: true, NewValue: false},
 			),
 		},
 		{
@@ -60,7 +60,7 @@ func TestGenMapDiff(t *testing.T) {
 			mapB: diff.Map{testKey: diff.Null{}},
 			want: nestedDiff(
 				diff.Node{
-					Key: testKey, TypeDiff: diff.Unchanged, OldValue: diff.Null{}},
+					Key: testKey, TypeDiff: diff.Unchanged, OldValue: nil},
 			),
 		},
 		{
@@ -72,8 +72,8 @@ func TestGenMapDiff(t *testing.T) {
 					Key:      testNested,
 					TypeDiff: diff.Nested,
 					Children: []diff.Node{
-						{Key: "a", TypeDiff: diff.Unchanged, OldValue: diff.Number(1)},
-						{Key: "b", TypeDiff: diff.Added, NewValue: diff.Number(2)},
+						{Key: "a", TypeDiff: diff.Unchanged, OldValue: 1.0},
+						{Key: "b", TypeDiff: diff.Added, NewValue: 2.0},
 					},
 				},
 			),
@@ -86,8 +86,8 @@ func TestGenMapDiff(t *testing.T) {
 				diff.Node{
 					Key:      testArrayKey,
 					TypeDiff: diff.Changed,
-					OldValue: diff.Slice{diff.Number(1), diff.Number(2)},
-					NewValue: diff.Slice{diff.Number(1), diff.Number(3), diff.Number(4)},
+					OldValue: []any{1.0, 2.0},
+					NewValue: []any{1.0, 3.0, 4.0},
 				},
 			),
 		},
@@ -176,11 +176,11 @@ func TestIsEqualUnreachable(t *testing.T) {
 
 func TestBuildDiff(t *testing.T) {
 	assert.Equal(t,
-		diff.Node{TypeDiff: diff.Added, OldValue: nil, NewValue: diff.Number(1)},
+		diff.Node{TypeDiff: diff.Added, OldValue: nil, NewValue: 1.0},
 		buildDiff(diff.Added, diff.Number(1), diff.Number(1)),
 	)
 	assert.Equal(t,
-		diff.Node{TypeDiff: diff.Changed, OldValue: diff.Number(1), NewValue: diff.Number(2)},
+		diff.Node{TypeDiff: diff.Changed, OldValue: 1.0, NewValue: 2.0},
 		buildDiff(diff.Changed, diff.Number(1), diff.Number(2)),
 	)
 }
@@ -196,21 +196,21 @@ func TestRecursiveGendiff(t *testing.T) {
 			name: "changed primitive",
 			a:    diff.Boolean(true),
 			b:    diff.Boolean(false),
-			want: diff.Node{TypeDiff: diff.Changed, OldValue: diff.Boolean(true), NewValue: diff.Boolean(false)},
+			want: diff.Node{TypeDiff: diff.Changed, OldValue: true, NewValue: false},
 		},
 		{
 			name: "unchanged nested map",
 			a:    diff.Map{"k": diff.String("v")},
 			b:    diff.Map{"k": diff.String("v")},
 			want: nestedDiff(
-				diff.Node{Key: "k", TypeDiff: diff.Unchanged, OldValue: diff.String("v")},
+				diff.Node{Key: "k", TypeDiff: diff.Unchanged, OldValue: "v"},
 			),
 		},
 		{
 			name: "changed nested slice",
 			a:    diff.Slice{diff.Number(1), diff.Number(2)},
 			b:    diff.Slice{diff.Number(1), diff.Number(3)},
-			want: diff.Node{TypeDiff: diff.Changed, OldValue: diff.Slice{diff.Number(1), diff.Number(2)}, NewValue: diff.Slice{diff.Number(1), diff.Number(3)}},
+			want: diff.Node{TypeDiff: diff.Changed, OldValue: []any{1.0, 2.0}, NewValue: []any{1.0, 3.0}},
 		},
 	}
 

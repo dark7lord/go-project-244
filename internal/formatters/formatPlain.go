@@ -30,13 +30,13 @@ func formatPlain(df diff.Node, keys []string) string {
 
 	switch df.TypeDiff {
 	case diff.Added:
-		strValue := formatValue(diff.ToNative(df.NewValue))
+		strValue := formatValue(df.NewValue)
 		return fmt.Sprintf("Property '%s' was added with value: %s", strKeys, strValue)
 	case diff.Removed:
 		return fmt.Sprintf("Property '%s' was removed", strKeys)
 	case diff.Changed:
-		strOldValue := formatValue(diff.ToNative(df.OldValue))
-		strNewValue := formatValue(diff.ToNative(df.NewValue))
+		strOldValue := formatValue(df.OldValue)
+		strNewValue := formatValue(df.NewValue)
 		return fmt.Sprintf("Property '%s' was updated. From %s to %s", strKeys, strOldValue, strNewValue)
 	case diff.Nested:
 		var builder strings.Builder

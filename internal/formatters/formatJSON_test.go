@@ -30,13 +30,13 @@ func TestFormatJSON(t *testing.T) {
 					{
 						Key:      "nullAdded",
 						TypeDiff: diff.Added,
-						NewValue: diff.Null{},
+						NewValue: nil,
 					},
 					{
 						Key:      "nullChanged",
 						TypeDiff: diff.Changed,
-						OldValue: diff.String("old"),
-						NewValue: diff.Null{},
+						OldValue: "old",
+						NewValue: nil,
 					},
 				},
 			},
@@ -61,7 +61,7 @@ func TestFormatJSON(t *testing.T) {
 func TestFormatJSONNoError(t *testing.T) {
 	_, err := formatters.PrintDiff(diff.Node{
 		TypeDiff: diff.Unchanged,
-		OldValue: diff.String("test"),
+		OldValue: "test",
 	}, formatters.JSON)
 
 	require.NoError(t, err)
