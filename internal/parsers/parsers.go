@@ -9,31 +9,52 @@ import (
 	"path/filepath"
 
 	"gopkg.in/yaml.v3"
-
-	"code/internal/diff"
 )
 
 // ErrUnsupportedFileType is returned when the file type is not supported
 var ErrUnsupportedFileType = errors.New("unsupported file type")
 
-func parseJSON(data []byte) (diff.Value, error) {
+func parseJSON(data []byte) (any, error) {
 	var result any
 
 	if err := json.Unmarshal(data, &result); err != nil {
 		return nil, err
 	}
 
-	return diff.ToValue(result), nil
+	return result, nil
 }
 
-func parseYAML(data []byte) (diff.Value, error) {
+func parseYAML(data []byte) (any, error) {
 	var result any
 
 	if err := yaml.Unmarshal(data, &result); err != nil {
 		return nil, err
 	}
 
-	return diff.ToValue(result), nil
+	return normalizeYAML(result), nil
+}
+
+func normalizeYAML(v any) any {
+	switch val := v.(type) {
+	case int:
+		return float64(val)
+	case map[string]any:
+		m := make(map[string]any, len(val))
+		for k, v := range val {
+			m[k] = normalizeYAML(v)
+		}
+
+		return m
+	case []any:
+		s := make([]any, len(val))
+		for i, v := range val {
+			s[i] = normalizeYAML(v)
+		}
+
+		return s
+	default:
+		return v
+	}
 }
 
 func parseError(path, ext, op string, err error) error {
@@ -44,8 +65,8 @@ func parseError(path, ext, op string, err error) error {
 	return fmt.Errorf("parse error: path=%q type=%q %s: %w", path, ext, op, err)
 }
 
-// Parse function returns a json-like structure
-func Parse(path string) (diff.Value, error) {
+// Parse function returns a parsed JSON/YAML structure
+func Parse(path string) (any, error) {
 	ext := filepath.Ext(path)
 
 	fileInfo, err := os.Stat(path)

@@ -1,5 +1,4 @@
-// Package diff_builder provides functions to generate a diff between two data structures,
-// which can be maps or slices, and returns the resulting diff structure.
+// Package diff_builder builds a difference tree between two parsed data structures.
 package diff_builder
 
 import (
@@ -8,10 +7,10 @@ import (
 	"code/internal/diff"
 )
 
-func isEqual(a, b diff.Value) bool {
+func isEqual(a, b any) bool {
 	switch va := a.(type) {
-	case diff.Slice:
-		vb, ok := b.(diff.Slice)
+	case []any:
+		vb, ok := b.([]any)
 		if !ok || len(va) != len(vb) {
 			return false
 		}
@@ -23,8 +22,8 @@ func isEqual(a, b diff.Value) bool {
 
 		return true
 
-	case diff.Map:
-		vb, ok := b.(diff.Map)
+	case map[string]any:
+		vb, ok := b.(map[string]any)
 		if !ok || len(va) != len(vb) {
 			return false
 		}
@@ -37,27 +36,26 @@ func isEqual(a, b diff.Value) bool {
 
 		return true
 
-	case diff.Number:
-		vb, ok := b.(diff.Number)
+	case float64:
+		vb, ok := b.(float64)
 		return ok && va == vb
 
-	case diff.String:
-		vb, ok := b.(diff.String)
+	case string:
+		vb, ok := b.(string)
 		return ok && va == vb
 
-	case diff.Boolean:
-		vb, ok := b.(diff.Boolean)
+	case bool:
+		vb, ok := b.(bool)
 		return ok && va == vb
 
-	case diff.Null:
-		_, ok := b.(diff.Null)
-		return ok
+	case nil:
+		return b == nil
 	}
 
 	return false
 }
 
-func getDiffKeys(oldMap, newMap diff.Map) (removed, added, common []string) {
+func getDiffKeys(oldMap, newMap map[string]any) (removed, added, common []string) {
 	lenA, lenB := len(oldMap), len(newMap)
 	removed = make([]string, 0, lenA)
 	added = make([]string, 0, lenB)
@@ -80,7 +78,7 @@ func getDiffKeys(oldMap, newMap diff.Map) (removed, added, common []string) {
 	return removed, added, common
 }
 
-func genMapDiff(oldMap, newMap diff.Map) diff.Node {
+func genMapDiff(oldMap, newMap map[string]any) diff.Node {
 	removed, added, common := getDiffKeys(oldMap, newMap)
 	allKeys := append(append(removed, added...), common...)
 	slices.Sort(allKeys)
@@ -96,13 +94,13 @@ func genMapDiff(oldMap, newMap diff.Map) diff.Node {
 			nodes = append(nodes, diff.Node{
 				Key:      key,
 				TypeDiff: diff.Removed,
-				OldValue: diff.ToNative(oldMap[key]),
+				OldValue: oldMap[key],
 			})
 		case !inOld && inNew:
 			nodes = append(nodes, diff.Node{
 				Key:      key,
 				TypeDiff: diff.Added,
-				NewValue: diff.ToNative(newMap[key]),
+				NewValue: newMap[key],
 			})
 		default:
 			oldVal := oldMap[key]
@@ -131,10 +129,10 @@ func genMapDiff(oldMap, newMap diff.Map) diff.Node {
 	}
 }
 
-func buildDiff(typeDiff diff.Kind, oldValue, newValue diff.Value) diff.Node {
+func buildDiff(typeDiff diff.Kind, oldValue, newValue any) diff.Node {
 	result := diff.Node{
 		TypeDiff: typeDiff,
-		OldValue: diff.ToNative(oldValue),
+		OldValue: oldValue,
 	}
 
 	if typeDiff == diff.Added {
@@ -142,7 +140,7 @@ func buildDiff(typeDiff diff.Kind, oldValue, newValue diff.Value) diff.Node {
 	}
 
 	if typeDiff == diff.Added || typeDiff == diff.Changed {
-		result.NewValue = diff.ToNative(newValue)
+		result.NewValue = newValue
 	}
 
 	return result
@@ -150,9 +148,9 @@ func buildDiff(typeDiff diff.Kind, oldValue, newValue diff.Value) diff.Node {
 
 // RecursiveGendiff function recursively generates a diff between two data structures,
 // which can be maps or slices, and returns the resulting diff structure
-func RecursiveGendiff(dataA, dataB diff.Value) diff.Node {
-	oldVal, isOldMap := dataA.(diff.Map)
-	newVal, isNewMap := dataB.(diff.Map)
+func RecursiveGendiff(dataA, dataB any) diff.Node {
+	oldVal, isOldMap := dataA.(map[string]any)
+	newVal, isNewMap := dataB.(map[string]any)
 
 	if isOldMap && isNewMap {
 		return genMapDiff(oldVal, newVal)

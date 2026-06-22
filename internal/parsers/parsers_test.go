@@ -8,8 +8,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"code/internal/diff"
 )
 
 var fixtureDir = filepath.Join("..", "..", "testdata", "fixtures")
@@ -18,26 +16,26 @@ func TestParse(t *testing.T) {
 	tests := []struct {
 		name     string
 		path     string
-		expected diff.Value
+		expected any
 	}{
 		{
 			name: "valid json",
 			path: filepath.Join(fixtureDir, "flat", "fileA.json"),
-			expected: diff.Map{
-				"host":    diff.String("hexlet.io"),
-				"timeout": diff.Number(50),
-				"proxy":   diff.String("123.234.53.22"),
-				"follow":  diff.Boolean(false),
+			expected: map[string]any{
+				"host":    "hexlet.io",
+				"timeout": float64(50),
+				"proxy":   "123.234.53.22",
+				"follow":  false,
 			},
 		},
 		{
 			name: "valid yml",
 			path: filepath.Join(fixtureDir, "flat", "fileA.yml"),
-			expected: diff.Map{
-				"host":    diff.String("hexlet.io"),
-				"timeout": diff.Number(50),
-				"proxy":   diff.String("123.234.53.22"),
-				"follow":  diff.Boolean(false),
+			expected: map[string]any{
+				"host":    "hexlet.io",
+				"timeout": float64(50),
+				"proxy":   "123.234.53.22",
+				"follow":  false,
 			},
 		},
 	}
@@ -114,6 +112,32 @@ func TestParseMissingExtension(t *testing.T) {
 	_, err = Parse(path)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "missing file extension")
+}
+
+func TestNormalizeYAML(t *testing.T) {
+	tests := []struct {
+		name string
+		v    any
+		want any
+	}{
+		{name: "int", v: int(42), want: float64(42)},
+		{name: "string", v: "hello", want: "hello"},
+		{name: "bool", v: true, want: true},
+		{name: "float64", v: 3.14, want: 3.14},
+		{name: "nil", v: nil, want: nil},
+		{name: "slice",
+			v:    []any{int(1), "x", true, nil},
+			want: []any{float64(1), "x", true, nil}},
+		{name: "nested map",
+			v:    map[string]any{"a": int(1), "b": map[string]any{"c": int(2)}},
+			want: map[string]any{"a": float64(1), "b": map[string]any{"c": float64(2)}}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, normalizeYAML(tt.v))
+		})
+	}
 }
 
 func TestParsePermissionDenied(t *testing.T) {
