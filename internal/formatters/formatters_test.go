@@ -65,7 +65,7 @@ func TestPrintDiff(t *testing.T) {
 		{
 			name:   json,
 			format: formatters.JSON,
-			want:   "{\n  \"Key [added]\": \"value\"\n}",
+			want:   "[\n  {\n    \"key\": \"Key\",\n    \"type\": \"added\",\n    \"value\": \"value\"\n  }\n]",
 		},
 	}
 

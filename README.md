@@ -128,16 +128,34 @@ gendiff --format json fileA.json fileB.json
 ```
 
 ```json
-{
-  "follow [deleted]": false,
-  "host": "hexlet.io",
-  "proxy [deleted]": "123.234.53.22",
-  "timeout [changed]": {
-    "[new value]": 20,
-    "[old value]": 50
+[
+  {
+    "key": "follow",
+    "type": "removed",
+    "value": false
   },
-  "verbose [added]": true
-}
+  {
+    "key": "host",
+    "type": "unchanged",
+    "value": "hexlet.io"
+  },
+  {
+    "key": "proxy",
+    "type": "removed",
+    "value": "123.234.53.22"
+  },
+  {
+    "key": "timeout",
+    "type": "changed",
+    "oldValue": 50,
+    "newValue": 20
+  },
+  {
+    "key": "verbose",
+    "type": "added",
+    "value": true
+  }
+]
 ```
 
 [![asciicast](https://asciinema.org/a/wTgFtwRsjKA5wPbE.svg)](https://asciinema.org/a/wTgFtwRsjKA5wPbE)
@@ -291,54 +309,97 @@ gendiff --format json fileE.json fileF.json
 ```
 
 ```json
-{
-  "common": {
-    "follow [added]": false,
-    "setting1": "Value 1",
-    "setting2 [deleted]": 200,
-    "setting3 [changed]": {
-      "[new value]": null,
-      "[old value]": true
-    },
-    "setting4 [added]": "blah blah",
-    "setting5 [added]": {
+[
+  {
+    "key": "common.follow",
+    "type": "added",
+    "value": false
+  },
+  {
+    "key": "common.setting1",
+    "type": "unchanged",
+    "value": "Value 1"
+  },
+  {
+    "key": "common.setting2",
+    "type": "removed",
+    "value": 200
+  },
+  {
+    "key": "common.setting3",
+    "type": "changed",
+    "oldValue": true
+  },
+  {
+    "key": "common.setting4",
+    "type": "added",
+    "value": "blah blah"
+  },
+  {
+    "key": "common.setting5",
+    "type": "added",
+    "value": {
       "key5": "value5"
-    },
-    "setting6": {
-      "doge": {
-        "wow [changed]": {
-          "[new value]": "so much",
-          "[old value]": ""
-        }
-      },
-      "key": "value",
-      "ops [added]": "vops"
     }
   },
-  "group1": {
-    "baz [changed]": {
-      "[new value]": "bars",
-      "[old value]": "bas"
+  {
+    "key": "common.setting6.doge.wow",
+    "type": "changed",
+    "oldValue": "",
+    "newValue": "so much"
+  },
+  {
+    "key": "common.setting6.key",
+    "type": "unchanged",
+    "value": "value"
+  },
+  {
+    "key": "common.setting6.ops",
+    "type": "added",
+    "value": "vops"
+  },
+  {
+    "key": "group1.baz",
+    "type": "changed",
+    "oldValue": "bas",
+    "newValue": "bars"
+  },
+  {
+    "key": "group1.foo",
+    "type": "unchanged",
+    "value": "bar"
+  },
+  {
+    "key": "group1.nest",
+    "type": "changed",
+    "oldValue": {
+      "key": "value"
     },
-    "foo": "bar",
-    "nest [changed]": {
-      "[new value]": "str",
-      "[old value]": {
-        "key": "value"
+    "newValue": "str"
+  },
+  {
+    "key": "group2",
+    "type": "removed",
+    "value": {
+      "abc": 12345,
+      "deep": {
+        "id": 45
       }
     }
   },
-  "group2 [deleted]": {
-    "abc": 12345,
-    "deep": { "id": 45 }
-  },
-  "group3 [added]": {
-    "deep": {
-      "id": { "number": 45 }
-    },
-    "fee": 100500
+  {
+    "key": "group3",
+    "type": "added",
+    "value": {
+      "deep": {
+        "id": {
+          "number": 45
+        }
+      },
+      "fee": 100500
+    }
   }
-}
+]
 ```
 
 [![asciicast](https://asciinema.org/a/S2G5LZfO4csOrVh6.svg)](https://asciinema.org/a/S2G5LZfO4csOrVh6)

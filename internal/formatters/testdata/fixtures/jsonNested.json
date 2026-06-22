@@ -1,28 +1,52 @@
-{
-  "outerAdded [added]": {
-    "addedNestedKey": "addedNestedValue"
+[
+  {
+    "key": "outerUnchanged",
+    "type": "unchanged",
+    "value": "value1"
   },
-  "outerChanged [changed]": {
-    "[new value]": {
-      "newNestedKey": "newNestedValue"
-    },
-    "[old value]": {
-      "oldNestedKey": "oldNestedValue"
+  {
+    "key": "outerNested.nestedUnchanged",
+    "type": "unchanged",
+    "value": "nestedValue"
+  },
+  {
+    "key": "outerNested.nestedAdded",
+    "type": "added",
+    "value": "addedNestedValue"
+  },
+  {
+    "key": "outerNested.nestedRemoved",
+    "type": "removed",
+    "value": "removedNestedValue"
+  },
+  {
+    "key": "outerNested.nestedDeep.deepChanged",
+    "type": "changed",
+    "oldValue": "oldDeepValue",
+    "newValue": "newDeepValue"
+  },
+  {
+    "key": "outerAdded",
+    "type": "added",
+    "value": {
+      "addedNestedKey": "addedNestedValue"
     }
   },
-  "outerNested": {
-    "nestedAdded [added]": "addedNestedValue",
-    "nestedDeep": {
-      "deepChanged [changed]": {
-        "[new value]": "newDeepValue",
-        "[old value]": "oldDeepValue"
-      }
+  {
+    "key": "outerRemoved",
+    "type": "removed",
+    "value": {
+      "removedNestedKey": "removedNestedValue"
+    }
+  },
+  {
+    "key": "outerChanged",
+    "type": "changed",
+    "oldValue": {
+      "oldNestedKey": "oldNestedValue"
     },
-    "nestedRemoved [deleted]": "removedNestedValue",
-    "nestedUnchanged": "nestedValue"
-  },
-  "outerRemoved [deleted]": {
-    "removedNestedKey": "removedNestedValue"
-  },
-  "outerUnchanged": "value1"
-}
+    "newValue": {
+      "newNestedKey": "newNestedValue"
+    }
+  }
+]

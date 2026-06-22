@@ -3,58 +3,87 @@ package formatters
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
+	"strings"
 
 	"code/internal/diff"
 )
 
-func transformDiff(d diff.Node) any {
-	result := map[string]any{}
+type addedEntry struct {
+	Key   string `json:"key"`
+	Type  string `json:"type"`
+	Value any    `json:"value"`
+}
 
-	switch d.TypeDiff {
-	case diff.Added:
-		return diff.ToNative(d.NewValue)
-	case diff.Removed:
-		return diff.ToNative(d.OldValue)
-	case diff.Changed:
-		result["[old value]"] = diff.ToNative(d.OldValue)
-		result["[new value]"] = diff.ToNative(d.NewValue)
-	case diff.Unchanged:
-		return diff.ToNative(d.OldValue)
-	case diff.Nested:
-		if len(d.Children) == 0 {
-			return result
+type removedEntry struct {
+	Key   string `json:"key"`
+	Type  string `json:"type"`
+	Value any    `json:"value"`
+}
+
+type changedEntry struct {
+	Key      string `json:"key"`
+	Type     string `json:"type"`
+	OldValue any    `json:"oldValue"`
+	NewValue any    `json:"newValue"`
+}
+
+type unchangedEntry struct {
+	Key   string `json:"key"`
+	Type  string `json:"type"`
+	Value any    `json:"value"`
+}
+
+func flattenDiff(df diff.Node, path []string) []any {
+	key := strings.Join(path, ".")
+
+	if df.TypeDiff == diff.Nested {
+		var entries []any
+		for _, child := range df.Children {
+			childPath := append(slices.Clone(path), child.Key)
+			entries = append(entries, flattenDiff(child, childPath)...)
 		}
 
-		for _, child := range d.Children {
-			var prefix string
-
-			switch child.TypeDiff {
-			case diff.Added:
-				prefix = "added"
-			case diff.Removed:
-				prefix = "deleted"
-			case diff.Changed:
-				prefix = "changed"
-			default:
-				prefix = ""
-			}
-
-			resultKey := child.Key
-
-			if prefix != "" {
-				resultKey = fmt.Sprintf("%s [%s]", child.Key, prefix)
-			}
-
-			result[resultKey] = transformDiff(child)
-		}
+		return entries
 	}
 
-	return result
+	switch df.TypeDiff {
+	case diff.Added:
+		return []any{addedEntry{
+			Key:   key,
+			Type:  "added",
+			Value: diff.ToNative(df.NewValue),
+		}}
+
+	case diff.Removed:
+		return []any{removedEntry{
+			Key:   key,
+			Type:  "removed",
+			Value: diff.ToNative(df.OldValue),
+		}}
+
+	case diff.Changed:
+		return []any{changedEntry{
+			Key:      key,
+			Type:     "changed",
+			OldValue: diff.ToNative(df.OldValue),
+			NewValue: diff.ToNative(df.NewValue),
+		}}
+
+	case diff.Unchanged:
+		return []any{unchangedEntry{Key: key, Type: "unchanged", Value: diff.ToNative(df.OldValue)}}
+	}
+
+	return nil
 }
 
 func formatJSON(df diff.Node) (string, error) {
-	cleaned := transformDiff(df)
-	jsonDiff, err := json.MarshalIndent(cleaned, "", "  ")
+	entries := flattenDiff(df, []string{})
+	if len(entries) == 0 {
+		return "[]", nil
+	}
+
+	jsonDiff, err := json.MarshalIndent(entries, "", "  ")
 	if err != nil {
 		return "", fmt.Errorf("json marshal error: %w", err)
 	}
