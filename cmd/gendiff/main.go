@@ -13,6 +13,11 @@ import (
 
 const binaryName = "gendiff"
 
+const (
+	ExitOK    = 0
+	ExitError = 1
+)
+
 func run(args []string) error {
 	cmd := &cli.Command{
 		Name:                  binaryName,
@@ -51,9 +56,13 @@ func run(args []string) error {
 	return cmd.Run(context.Background(), args)
 }
 
+var osExit = os.Exit
+
 func main() {
 	if err := run(os.Args); err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		osExit(ExitError)
+		return
 	}
+	osExit(ExitOK)
 }
