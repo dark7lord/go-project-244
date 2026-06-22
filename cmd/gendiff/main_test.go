@@ -10,23 +10,45 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestRunSuccess(t *testing.T) {
-	err := run([]string{
-		binaryName,
-		filepath.Join("..", "..", "testdata", "fixtures", "flat", "fileA.json"),
-		filepath.Join("..", "..", "testdata", "fixtures", "flat", "fileB.json"),
-	})
-	require.NoError(t, err)
-}
+func TestRun(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    []string
+		wantErr string
+	}{
+		{
+			name: "success",
+			args: []string{
+				binaryName,
+				filepath.Join("..", "..", "testdata", "fixtures", "flat", "fileA.json"),
+				filepath.Join("..", "..", "testdata", "fixtures", "flat", "fileB.json"),
+			},
+		},
+		{
+			name:    "invalid args",
+			args:    []string{binaryName, "fileA.json"},
+			wantErr: "expected 2 file paths, got 1",
+		},
+		{
+			name:    "gen diff error",
+			args:    []string{binaryName, "nonexistent.json", "alsonothere.json"},
+			wantErr: "*",
+		},
+	}
 
-func TestRunInvalidArgs(t *testing.T) {
-	err := run([]string{binaryName, "fileA.json"})
-	require.EqualError(t, err, "expected 2 file paths, got 1")
-}
-
-func TestRunGenDiffError(t *testing.T) {
-	err := run([]string{binaryName, "nonexistent.json", "alsonothere.json"})
-	require.Error(t, err)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := run(tt.args)
+			switch tt.wantErr {
+			case "":
+				require.NoError(t, err)
+			case "*":
+				require.Error(t, err)
+			default:
+				require.EqualError(t, err, tt.wantErr)
+			}
+		})
+	}
 }
 
 func TestMainError(t *testing.T) {
