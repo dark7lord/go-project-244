@@ -1,4 +1,4 @@
-// Package code provides functions for getting the difference between files
+// Package code provides functions for comparing two configuration files and formatting the difference
 package code
 
 import (

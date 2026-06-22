@@ -1,4 +1,4 @@
-// Package main implements a CLI utility to get the difference between two files like git diff
+// Package main implements a CLI utility for comparing two configuration files (JSON/YAML)
 package main
 
 import (
@@ -16,7 +16,8 @@ const binaryName = "gendiff"
 func run(args []string) error {
 	cmd := &cli.Command{
 		Name:                  binaryName,
-		Usage:                 "Compares two configuration files and shows a difference.",
+		Usage:                 "Compares two configuration files (JSON/YAML) and shows a difference (stylish, plain, json).",
+		ArgsUsage:             "<old_file> <new_file>",
 		EnableShellCompletion: true,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
@@ -24,7 +25,7 @@ func run(args []string) error {
 				Aliases:     []string{"f"},
 				DefaultText: "stylish",
 				Value:       "stylish",
-				Usage:       "output format",
+				Usage:       "output format (stylish, plain, json)",
 			},
 		},
 		Action: func(_ context.Context, cmd *cli.Command) error {

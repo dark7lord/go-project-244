@@ -1,5 +1,5 @@
 # Gendiff
-CLI utility for generating a diff between two files, supporting JSON and YAML input and stylish, plain, and JSON output
+Compares two configuration files (JSON/YAML) and shows a difference (stylish, plain, json).
 
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/dark7lord/go-project-244/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/dark7lord/go-project-244/actions)
@@ -27,7 +27,7 @@ After installation, make sure `$(go env GOPATH)/bin` is in your `$PATH`:
 export PATH=$PATH:$(go env GOPATH)/bin
 ```
 
-### Build only (binary stays in current directory)
+### Build only (binary stays in ./bin)
 
 ```bash
 make build
@@ -45,7 +45,7 @@ go clean -i ./cmd/gendiff/
 ## Usage
 
 ```
-gendiff [--format <format>] <file1> <file2>
+gendiff [global options] <old_file> <new_file>
 ```
 
 The `--format` flag supports three output styles:
