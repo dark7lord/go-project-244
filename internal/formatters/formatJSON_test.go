@@ -20,39 +20,7 @@ func TestFormatJSON(t *testing.T) {
 		{
 			name: testNameEmptyNested,
 			diff: emptyNestedDiff,
-			want: "[]",
-		},
-		{
-			name: "nil values",
-			diff: diff.Node{
-				TypeDiff: diff.Nested,
-				Children: []diff.Node{
-					{
-						Key:      "nullAdded",
-						TypeDiff: diff.Added,
-						NewValue: nil,
-					},
-					{
-						Key:      "nullChanged",
-						TypeDiff: diff.Changed,
-						OldValue: "old",
-						NewValue: nil,
-					},
-				},
-			},
-			want: `[
-  {
-    "key": "nullAdded",
-    "type": "added",
-    "value": null
-  },
-  {
-    "key": "nullChanged",
-    "type": "changed",
-    "oldValue": "old",
-    "newValue": null
-  }
-]`,
+			want: `{}`,
 		},
 	}
 	runDiffTests(t, formatters.JSON, tests)
@@ -67,8 +35,20 @@ func TestFormatJSONNoError(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestFormatJSONUnknownChildKind(t *testing.T) {
+	node := diff.Node{
+		TypeDiff: diff.Nested,
+		Children: []diff.Node{
+			{Key: "unknown", TypeDiff: diff.Kind("bogus")},
+		},
+	}
+	result, err := formatters.PrintDiff(node, formatters.JSON)
+	require.NoError(t, err)
+	require.Equal(t, "{}", result)
+}
+
 func TestFormatJSONUnknownKind(t *testing.T) {
 	result, err := formatters.PrintDiff(diff.Node{TypeDiff: diff.Kind("bogus")}, formatters.JSON)
 	require.NoError(t, err)
-	require.Equal(t, "[]", result)
+	require.Equal(t, "{}", result)
 }

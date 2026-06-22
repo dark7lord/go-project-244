@@ -3,94 +3,67 @@ package formatters
 import (
 	"encoding/json"
 	"fmt"
-	"slices"
-	"strings"
 
 	"code/internal/diff"
 )
 
-type addedEntry struct {
-	Key   string `json:"key"`
-	Type  string `json:"type"`
-	Value any    `json:"value"`
-}
-
-type removedEntry struct {
-	Key   string `json:"key"`
-	Type  string `json:"type"`
-	Value any    `json:"value"`
-}
-
-type changedEntry struct {
-	Key      string `json:"key"`
-	Type     string `json:"type"`
-	OldValue any    `json:"oldValue"`
-	NewValue any    `json:"newValue"`
-}
-
-type unchangedEntry struct {
-	Key   string `json:"key"`
-	Type  string `json:"type"`
-	Value any    `json:"value"`
-}
-
-func flattenDiff(df diff.Node, path []string) []any {
-	key := strings.Join(path, ".")
-
-	if df.TypeDiff == diff.Nested {
-		var entries []any
-		for _, child := range df.Children {
-			childPath := append(slices.Clone(path), child.Key)
-			entries = append(entries, flattenDiff(child, childPath)...)
-		}
-
-		return entries
-	}
-
-	switch df.TypeDiff {
-	case diff.Added:
-		return []any{addedEntry{
-			Key:   key,
-			Type:  "added",
-			Value: df.NewValue,
-		}}
-
-	case diff.Removed:
-		return []any{removedEntry{
-			Key:   key,
-			Type:  "removed",
-			Value: df.OldValue,
-		}}
-
-	case diff.Changed:
-		return []any{changedEntry{
-			Key:      key,
-			Type:     "changed",
-			OldValue: df.OldValue,
-			NewValue: df.NewValue,
-		}}
-
-	case diff.Unchanged:
-		return []any{unchangedEntry{
-			Key:   key,
-			Type:  "unchanged",
-			Value: df.OldValue,
-		}}
-	}
-
-	return nil
-}
-
 func formatJSON(df diff.Node) (string, error) {
-	entries := flattenDiff(df, []string{})
-	if len(entries) == 0 {
-		return "[]", nil
+	if df.TypeDiff != diff.Nested || len(df.Children) == 0 {
+		return "{}", nil
 	}
 
-	jsonDiff, err := json.MarshalIndent(entries, "", "  ")
+	result := buildJSONMap(df.Children)
+	jsonBytes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		return "", fmt.Errorf("json marshal error: %w", err)
 	}
+	return string(jsonBytes), nil
+}
 
-	return string(jsonDiff), nil
+func buildJSONMap(children []diff.Node) map[string]any {
+	result := make(map[string]any, len(children))
+
+	for _, child := range children {
+		if child.TypeDiff == diff.Nested {
+			result[child.Key] = map[string]any{
+				"type":     "nested",
+				"children": buildJSONMap(child.Children),
+			}
+		} else if leaf := buildLeaf(child); leaf != nil {
+			result[child.Key] = leaf
+		}
+	}
+
+	return result
+}
+
+func buildLeaf(n diff.Node) map[string]any {
+	switch n.TypeDiff {
+	case diff.Added:
+		return map[string]any{
+			"type":  "added",
+			"value": n.NewValue,
+		}
+
+	case diff.Removed:
+		return map[string]any{
+			"type":  "removed",
+			"value": n.OldValue,
+		}
+
+	case diff.Changed:
+		return map[string]any{
+			"type":     "changed",
+			"oldValue": n.OldValue,
+			"newValue": n.NewValue,
+		}
+
+	case diff.Unchanged:
+		return map[string]any{
+			"type":  "unchanged",
+			"value": n.OldValue,
+		}
+	}
+
+	return nil
 }

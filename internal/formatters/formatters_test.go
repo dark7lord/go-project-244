@@ -65,7 +65,7 @@ func TestPrintDiff(t *testing.T) {
 		{
 			name:   json,
 			format: formatters.JSON,
-			want:   "[\n  {\n    \"key\": \"Key\",\n    \"type\": \"added\",\n    \"value\": \"value\"\n  }\n]",
+			want:   "{\n  \"Key\": {\n    \"type\": \"added\",\n    \"value\": \"value\"\n  }\n}",
 		},
 	}
 
@@ -97,7 +97,7 @@ func TestFormat(t *testing.T) {
 	}{
 		{name: stylish, format: stylish, want: "{\n  + Key: value\n}"},
 		{name: plain, format: plain, want: "Property 'Key' was added with value: 'value'"},
-		{name: json, format: json, want: "[\n  {\n    \"key\": \"Key\",\n    \"type\": \"added\",\n    \"value\": \"value\"\n  }\n]"},
+		{name: json, format: json, want: "{\n  \"Key\": {\n    \"type\": \"added\",\n    \"value\": \"value\"\n  }\n}"},
 	}
 
 	for _, tt := range tests {
@@ -121,8 +121,14 @@ func TestPrintDiffUnsupportedFormat(t *testing.T) {
 
 func TestFormatJSONMarshalError(t *testing.T) {
 	node := diff.Node{
-		TypeDiff: diff.Added,
-		NewValue: math.NaN(),
+		TypeDiff: diff.Nested,
+		Children: []diff.Node{
+			{
+				Key:      "nan",
+				TypeDiff: diff.Added,
+				NewValue: math.NaN(),
+			},
+		},
 	}
 
 	_, err := formatters.PrintDiff(node, formatters.JSON)
