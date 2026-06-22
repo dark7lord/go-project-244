@@ -7,6 +7,16 @@ import (
 	"code/internal/diff"
 )
 
+type jsonKey = string
+
+const (
+	keyType     jsonKey = "type"
+	keyValue    jsonKey = "value"
+	keyOldValue jsonKey = "oldValue"
+	keyNewValue jsonKey = "newValue"
+	keyChildren jsonKey = "children"
+)
+
 func formatJSON(df diff.Node) (string, error) {
 	if df.TypeDiff != diff.Nested || len(df.Children) == 0 {
 		return "{}", nil
@@ -17,6 +27,7 @@ func formatJSON(df diff.Node) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("json marshal error: %w", err)
 	}
+
 	return string(jsonBytes), nil
 }
 
@@ -26,8 +37,8 @@ func buildJSONMap(children []diff.Node) map[string]any {
 	for _, child := range children {
 		if child.TypeDiff == diff.Nested {
 			result[child.Key] = map[string]any{
-				"type":     "nested",
-				"children": buildJSONMap(child.Children),
+				keyType:     "nested",
+				keyChildren: buildJSONMap(child.Children),
 			}
 		} else if leaf := buildLeaf(child); leaf != nil {
 			result[child.Key] = leaf
@@ -41,27 +52,27 @@ func buildLeaf(n diff.Node) map[string]any {
 	switch n.TypeDiff {
 	case diff.Added:
 		return map[string]any{
-			"type":  "added",
-			"value": n.NewValue,
+			keyType:  "added",
+			keyValue: n.NewValue,
 		}
 
 	case diff.Removed:
 		return map[string]any{
-			"type":  "removed",
-			"value": n.OldValue,
+			keyType:  "removed",
+			keyValue: n.OldValue,
 		}
 
 	case diff.Changed:
 		return map[string]any{
-			"type":     "changed",
-			"oldValue": n.OldValue,
-			"newValue": n.NewValue,
+			keyType:     "changed",
+			keyOldValue: n.OldValue,
+			keyNewValue: n.NewValue,
 		}
 
 	case diff.Unchanged:
 		return map[string]any{
-			"type":  "unchanged",
-			"value": n.OldValue,
+			keyType:  "unchanged",
+			keyValue: n.OldValue,
 		}
 	}
 
