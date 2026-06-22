@@ -78,6 +78,42 @@ func TestPrintDiff(t *testing.T) {
 	}
 }
 
+func TestFormat(t *testing.T) {
+	testDiff := diff.Node{
+		TypeDiff: diff.Nested,
+		Children: []diff.Node{
+			{
+				Key:      "Key",
+				TypeDiff: diff.Added,
+				NewValue: diff.String("value"),
+			},
+		},
+	}
+
+	tests := []struct {
+		name   string
+		format string
+		want   string
+	}{
+		{name: stylish, format: stylish, want: "{\n  + Key: value\n}"},
+		{name: plain, format: plain, want: "Property 'Key' was added with value: 'value'"},
+		{name: json, format: json, want: "[\n  {\n    \"key\": \"Key\",\n    \"type\": \"added\",\n    \"value\": \"value\"\n  }\n]"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := formatters.Format(tt.format, testDiff)
+			require.NoError(t, err)
+			require.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestFormatUnsupported(t *testing.T) {
+	_, err := formatters.Format("xml", diff.Node{})
+	require.Error(t, err)
+}
+
 func TestPrintDiffUnsupportedFormat(t *testing.T) {
 	_, err := formatters.PrintDiff(diff.Node{}, formatters.PrintFormat("xml"))
 	require.Error(t, err)

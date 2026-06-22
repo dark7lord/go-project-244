@@ -80,38 +80,38 @@ func getDiffKeys(oldMap, newMap diff.Map) (removed, added, common []string) {
 	return removed, added, common
 }
 
-func genMapDiff(mapA, mapB diff.Map) diff.Node {
-	removed, added, common := getDiffKeys(mapA, mapB)
+func genMapDiff(oldMap, newMap diff.Map) diff.Node {
+	removed, added, common := getDiffKeys(oldMap, newMap)
 	allKeys := append(append(removed, added...), common...)
 	slices.Sort(allKeys)
 
 	nodes := make([]diff.Node, 0, len(allKeys))
 
 	for _, key := range allKeys {
-		_, inA := mapA[key]
-		_, inB := mapB[key]
+		_, inOld := oldMap[key]
+		_, inNew := newMap[key]
 
 		switch {
-		case inA && !inB:
+		case inOld && !inNew:
 			nodes = append(nodes, diff.Node{
 				Key:      key,
 				TypeDiff: diff.Removed,
-				OldValue: mapA[key],
+				OldValue: oldMap[key],
 			})
-		case !inA && inB:
+		case !inOld && inNew:
 			nodes = append(nodes, diff.Node{
 				Key:      key,
 				TypeDiff: diff.Added,
-				NewValue: mapB[key],
+				NewValue: newMap[key],
 			})
 		default:
-			leftValue := mapA[key]
-			rightValue := mapB[key]
+			oldVal := oldMap[key]
+			newVal := newMap[key]
 
-			node := RecursiveGendiff(leftValue, rightValue)
+			node := RecursiveGendiff(oldVal, newVal)
 			node.Key = key
 
-			if !isEqual(leftValue, rightValue) {
+			if !isEqual(oldVal, newVal) {
 				typeDiff := diff.Changed
 
 				if len(node.Children) > 0 {
@@ -131,8 +131,7 @@ func genMapDiff(mapA, mapB diff.Map) diff.Node {
 	}
 }
 
-// BuildDiff function builds a Diff struct based on the type of difference and the old and new values
-func BuildDiff(typeDiff diff.Kind, oldValue, newValue diff.Value) diff.Node {
+func buildDiff(typeDiff diff.Kind, oldValue, newValue diff.Value) diff.Node {
 	result := diff.Node{
 		TypeDiff: typeDiff,
 		OldValue: oldValue,
@@ -152,11 +151,11 @@ func BuildDiff(typeDiff diff.Kind, oldValue, newValue diff.Value) diff.Node {
 // RecursiveGendiff function recursively generates a diff between two data structures,
 // which can be maps or slices, and returns the resulting diff structure
 func RecursiveGendiff(dataA, dataB diff.Value) diff.Node {
-	mapA, isAMap := dataA.(diff.Map)
-	mapB, isBmap := dataB.(diff.Map)
+	oldVal, isOldMap := dataA.(diff.Map)
+	newVal, isNewMap := dataB.(diff.Map)
 
-	if isAMap && isBmap {
-		return genMapDiff(mapA, mapB)
+	if isOldMap && isNewMap {
+		return genMapDiff(oldVal, newVal)
 	}
 
 	typeDiff := diff.Unchanged
@@ -165,5 +164,5 @@ func RecursiveGendiff(dataA, dataB diff.Value) diff.Node {
 		typeDiff = diff.Changed
 	}
 
-	return BuildDiff(typeDiff, dataA, dataB)
+	return buildDiff(typeDiff, dataA, dataB)
 }

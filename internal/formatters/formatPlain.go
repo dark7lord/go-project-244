@@ -41,7 +41,6 @@ func formatPlain(df diff.Node, keys []string) string {
 	case diff.Nested:
 		var builder strings.Builder
 
-		// if leftValue {} equals rigntValue {}
 		if len(df.Children) == 0 {
 			return ""
 		}

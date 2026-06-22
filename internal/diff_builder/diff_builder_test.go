@@ -177,11 +177,11 @@ func TestIsEqualUnreachable(t *testing.T) {
 func TestBuildDiff(t *testing.T) {
 	assert.Equal(t,
 		diff.Node{TypeDiff: diff.Added, OldValue: nil, NewValue: diff.Number(1)},
-		BuildDiff(diff.Added, diff.Number(1), diff.Number(1)),
+		buildDiff(diff.Added, diff.Number(1), diff.Number(1)),
 	)
 	assert.Equal(t,
 		diff.Node{TypeDiff: diff.Changed, OldValue: diff.Number(1), NewValue: diff.Number(2)},
-		BuildDiff(diff.Changed, diff.Number(1), diff.Number(2)),
+		buildDiff(diff.Changed, diff.Number(1), diff.Number(2)),
 	)
 }
 

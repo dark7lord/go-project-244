@@ -71,7 +71,11 @@ func flattenDiff(df diff.Node, path []string) []any {
 		}}
 
 	case diff.Unchanged:
-		return []any{unchangedEntry{Key: key, Type: "unchanged", Value: diff.ToNative(df.OldValue)}}
+		return []any{unchangedEntry{
+			Key:   key,
+			Type:  "unchanged",
+			Value: diff.ToNative(df.OldValue),
+		}}
 	}
 
 	return nil

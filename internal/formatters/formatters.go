@@ -25,6 +25,15 @@ func IsValidFormat(format string) bool {
 	return slices.Contains(formats, PrintFormat(format))
 }
 
+// Format function returns the difference as a string in the specified format
+func Format(name string, diff diff.Node) (string, error) {
+	if !IsValidFormat(name) {
+		return "", fmt.Errorf("unsupported format: %s", name)
+	}
+
+	return PrintDiff(diff, PrintFormat(name))
+}
+
 // PrintDiff function returns the difference between two structures as a string in the specified format
 func PrintDiff(diff diff.Node, format PrintFormat) (string, error) {
 	switch format {
