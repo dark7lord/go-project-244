@@ -10,7 +10,7 @@ import (
 	"code/internal/formatters"
 )
 
-func TestFormatPlainNoTrailingNewline(t *testing.T) {
+func TestPlainFormatterNoTrailingNewline(t *testing.T) {
 	diffNode := diff.Node{
 		TypeDiff: diff.Nested,
 		Children: []diff.Node{
@@ -22,12 +22,12 @@ func TestFormatPlainNoTrailingNewline(t *testing.T) {
 		},
 	}
 
-	got, err := formatters.PrintDiff(diffNode, formatters.Plain)
-	require.NoError(t, err, "PrintDiff() returned an error: %v", err)
+	got, err := formatters.Format(string(formatters.Plain), diffNode)
+	require.NoError(t, err, "Format() returned an error: %v", err)
 	require.Equal(t, "Property 'addedKey' was added with value: 'added value'", got)
 }
 
-func TestFormatPlain(t *testing.T) {
+func TestPlainFormatter(t *testing.T) {
 	tests := []diffTestCase{
 		{
 			name: "flat all types",

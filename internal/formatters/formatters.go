@@ -1,49 +1,31 @@
-// Package formatters provides functions for formatting the difference between files
+// Package formatters provides functions for formatting the difference between files.
 package formatters
 
-import (
-	"fmt"
-	"slices"
+import "code/internal/diff"
 
-	"code/internal/diff"
-)
+// OutputFormat represents a supported diff output format.
+type OutputFormat string
 
-// PrintFormat type represents the format in which the difference between files can be printed
-type PrintFormat string
-
-// Constants of formats in which the difference between files can be printed
+// Supported output formats.
 const (
-	Stylish PrintFormat = "stylish"
-	Plain   PrintFormat = "plain"
-	JSON    PrintFormat = "json"
+	Stylish OutputFormat = "stylish"
+	Plain   OutputFormat = "plain"
+	JSON    OutputFormat = "json"
 )
 
-var formats = []PrintFormat{Stylish, Plain, JSON}
-
-// IsValidFormat checks if the provided format is valid
+// IsValidFormat reports whether the provided format is supported.
 func IsValidFormat(format string) bool {
-	return slices.Contains(formats, PrintFormat(format))
+	_, err := NewFormatter(format)
+
+	return err == nil
 }
 
-// Format function returns the difference as a string in the specified format
-func Format(name string, diff diff.Node) (string, error) {
-	if !IsValidFormat(name) {
-		return "", fmt.Errorf("unsupported format: %s", name)
+// Format returns the diff rendered in the specified output format.
+func Format(format string, df diff.Node) (string, error) {
+	formatter, err := NewFormatter(format)
+	if err != nil {
+		return "", err
 	}
 
-	return PrintDiff(diff, PrintFormat(name))
-}
-
-// PrintDiff function returns the difference between two structures as a string in the specified format
-func PrintDiff(diff diff.Node, format PrintFormat) (string, error) {
-	switch format {
-	case Stylish:
-		return formatStylish(diff, 0), nil
-	case JSON:
-		return formatJSON(diff)
-	case Plain:
-		return formatPlain(diff, []string{}), nil
-	default:
-		return "", fmt.Errorf("unsupported format: %s", format)
-	}
+	return formatter.Format(df)
 }

@@ -8,7 +8,7 @@ import (
 	"code/internal/diff"
 )
 
-func formatValue(value any) string {
+func renderPlainValue(value any) string {
 	switch value.(type) {
 	case string:
 		return fmt.Sprintf("'%s'", value)
@@ -21,23 +21,23 @@ func formatValue(value any) string {
 	}
 }
 
-func formatPlain(df diff.Node, keys []string) string {
-	var strKeys string
+func renderPlain(df diff.Node, keys []string) string {
+	var propertyPath string
 
 	if df.TypeDiff != diff.Nested {
-		strKeys = strings.Join(keys, ".")
+		propertyPath = strings.Join(keys, ".")
 	}
 
 	switch df.TypeDiff {
 	case diff.Added:
-		strValue := formatValue(df.NewValue)
-		return fmt.Sprintf("Property '%s' was added with value: %s", strKeys, strValue)
+		value := renderPlainValue(df.NewValue)
+		return fmt.Sprintf("Property '%s' was added with value: %s", propertyPath, value)
 	case diff.Removed:
-		return fmt.Sprintf("Property '%s' was removed", strKeys)
+		return fmt.Sprintf("Property '%s' was removed", propertyPath)
 	case diff.Changed:
-		strOldValue := formatValue(df.OldValue)
-		strNewValue := formatValue(df.NewValue)
-		return fmt.Sprintf("Property '%s' was updated. From %s to %s", strKeys, strOldValue, strNewValue)
+		oldValue := renderPlainValue(df.OldValue)
+		newValue := renderPlainValue(df.NewValue)
+		return fmt.Sprintf("Property '%s' was updated. From %s to %s", propertyPath, oldValue, newValue)
 	case diff.Nested:
 		var builder strings.Builder
 
@@ -47,7 +47,7 @@ func formatPlain(df diff.Node, keys []string) string {
 
 		for _, child := range df.Children {
 			childKeys := append(slices.Clone(keys), child.Key)
-			result := formatPlain(child, childKeys)
+			result := renderPlain(child, childKeys)
 
 			if len(result) == 0 {
 				continue
@@ -61,7 +61,6 @@ func formatPlain(df diff.Node, keys []string) string {
 		}
 
 		return builder.String()
-
 	}
 
 	return ""

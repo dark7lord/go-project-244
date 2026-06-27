@@ -8,6 +8,30 @@ const (
 	testNamePrimitiveValue = "value"
 )
 
+const singleAddedNodeJSON = `{
+		"type": "nested",
+		"children": [
+			{
+				"key": "Key",
+				"type": "added",
+				"newValue": "value"
+			}
+		]
+	}`
+
+func singleAddedDiff() diff.Node {
+	return diff.Node{
+		TypeDiff: diff.Nested,
+		Children: []diff.Node{
+			{
+				Key:      "Key",
+				TypeDiff: diff.Added,
+				NewValue: testNamePrimitiveValue,
+			},
+		},
+	}
+}
+
 var flatDiffAll = diff.Node{
 	TypeDiff: diff.Nested,
 	Children: []diff.Node{

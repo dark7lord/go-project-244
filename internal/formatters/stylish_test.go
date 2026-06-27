@@ -8,7 +8,7 @@ import (
 	"code/internal/formatters"
 )
 
-func TestFormatStylish(t *testing.T) {
+func TestStylishFormatter(t *testing.T) {
 	tests := []diffTestCase{
 		{
 			name: "primitive",

@@ -12,7 +12,6 @@ import (
 	"code/internal/formatters"
 )
 
-// readFileToString читает файл и возвращает обрезанную строку.
 func readFileToString(t *testing.T, path string) string {
 	t.Helper()
 	data, err := os.ReadFile(path)
@@ -28,22 +27,32 @@ type diffTestCase struct {
 	path string
 }
 
-// runDiffTests выполняет общий цикл тестирования для заданного формата.
-func runDiffTests(t *testing.T, format formatters.PrintFormat, tests []diffTestCase) {
+func requireOutputEqual(t *testing.T, format formatters.OutputFormat, expected, actual string) {
+	t.Helper()
+
+	if format == formatters.JSON {
+		require.JSONEq(t, expected, actual)
+		return
+	}
+
+	if diff := cmp.Diff(expected, actual); diff != "" {
+		t.Errorf("formatter output mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func runDiffTests(t *testing.T, format formatters.OutputFormat, tests []diffTestCase) {
 	t.Helper()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := formatters.PrintDiff(tt.diff, format)
-			require.NoError(t, err, "PrintDiff() returned an error: %v", err)
+			got, err := formatters.Format(string(format), tt.diff)
+			require.NoError(t, err, "Format() returned an error: %v", err)
 			actual := strings.TrimSpace(got)
 
 			if tt.path != "" {
 				expected := readFileToString(t, tt.path)
-				if diff := cmp.Diff(expected, actual); diff != "" {
-					t.Errorf("PrintDiff() mismatch (-want +got):\n%s", diff)
-				}
-			} else if actual != tt.want {
-				t.Errorf("PrintDiff() = %v, want %v", actual, tt.want)
+				requireOutputEqual(t, format, expected, actual)
+			} else {
+				requireOutputEqual(t, format, tt.want, actual)
 			}
 		})
 	}

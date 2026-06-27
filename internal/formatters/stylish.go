@@ -8,7 +8,7 @@ import (
 	"code/internal/diff"
 )
 
-func renderSlice(slice []any, deep int) string {
+func renderStylishSlice(slice []any, deep int) string {
 	if len(slice) == 0 {
 		return "[]"
 	}
@@ -21,7 +21,7 @@ func renderSlice(slice []any, deep int) string {
 
 	for _, item := range slice {
 		builder.WriteString(innerPad)
-		builder.WriteString(renderValue(item, deep+1))
+		builder.WriteString(renderStylishValue(item, deep+1))
 		builder.WriteByte('\n')
 	}
 
@@ -31,7 +31,7 @@ func renderSlice(slice []any, deep int) string {
 	return builder.String()
 }
 
-func renderMap(mp map[string]any, deep int) string {
+func renderStylishMap(mp map[string]any, deep int) string {
 	if len(mp) == 0 {
 		return "{}"
 	}
@@ -51,7 +51,7 @@ func renderMap(mp map[string]any, deep int) string {
 		childVal := mp[key]
 		builder.WriteString(innerPad)
 		fmt.Fprintf(&builder, "%s: ", key)
-		builder.WriteString(renderValue(childVal, deep+1))
+		builder.WriteString(renderStylishValue(childVal, deep+1))
 		builder.WriteByte('\n')
 	}
 
@@ -61,12 +61,12 @@ func renderMap(mp map[string]any, deep int) string {
 	return builder.String()
 }
 
-func renderValue(value any, deep int) string {
+func renderStylishValue(value any, deep int) string {
 	switch v := value.(type) {
 	case []any:
-		return renderSlice(v, deep)
+		return renderStylishSlice(v, deep)
 	case map[string]any:
-		return renderMap(v, deep)
+		return renderStylishMap(v, deep)
 	case nil:
 		return "null"
 	default:
@@ -74,7 +74,7 @@ func renderValue(value any, deep int) string {
 	}
 }
 
-func formatStylish(df diff.Node, deep int) string {
+func renderStylish(df diff.Node, deep int) string {
 	var builder strings.Builder
 
 	repeats := (4 * deep) - 2
@@ -84,14 +84,14 @@ func formatStylish(df diff.Node, deep int) string {
 		if deep == 0 {
 			trimmedPrefix := strings.TrimLeft(prefix, " ")
 			builder.WriteString(trimmedPrefix)
-			builder.WriteString(renderValue(value, deep))
+			builder.WriteString(renderStylishValue(value, deep))
 
 			return
 		}
 
 		builder.WriteString(pad)
 		builder.WriteString(prefix)
-		fmt.Fprintf(&builder, "%s: %s", key, renderValue(value, deep))
+		fmt.Fprintf(&builder, "%s: %s", key, renderStylishValue(value, deep))
 	}
 
 	switch df.TypeDiff {
@@ -124,7 +124,7 @@ func formatStylish(df diff.Node, deep int) string {
 
 		for _, child := range df.Children {
 			builder.WriteByte('\n')
-			childStr := formatStylish(child, deep+1)
+			childStr := renderStylish(child, deep+1)
 			builder.WriteString(childStr)
 		}
 
