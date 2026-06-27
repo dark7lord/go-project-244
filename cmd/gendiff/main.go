@@ -1,3 +1,4 @@
+// Package main provides the gendiff command-line entrypoint.
 package main
 
 import (
@@ -7,5 +8,6 @@ import (
 )
 
 func main() {
-	os.Exit(cli.Execute(os.Args, os.Stderr))
+	exitCode := cli.Execute(os.Args, os.Stderr)
+	os.Exit(exitCode)
 }

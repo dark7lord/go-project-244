@@ -13,6 +13,8 @@ import (
 
 // ErrUnsupportedFileType is returned when the file type is not supported
 var ErrUnsupportedFileType = errors.New("unsupported file type")
+
+// ErrUnsupportedRootType is returned when the parsed file root is not an object.
 var ErrUnsupportedRootType = errors.New("unsupported root type: expected map[string]any")
 
 func parseJSON(data []byte) (map[string]any, error) {
@@ -109,12 +111,14 @@ func Parse(path string) (map[string]any, error) {
 		if err != nil {
 			return nil, parseError(path, ext, "parse", err)
 		}
+
 		return ensureMap(value)
 	case ".yml", ".yaml":
 		value, err := parseYAML(fileBytes)
 		if err != nil {
 			return nil, parseError(path, ext, "parse", err)
 		}
+
 		return ensureMap(value)
 	default:
 		return nil, fmt.Errorf("parser: path=%q type=%q: %w", path, ext, ErrUnsupportedFileType)

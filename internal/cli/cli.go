@@ -1,3 +1,4 @@
+// Package cli provides command-line execution for gendiff.
 package cli
 
 import (
@@ -10,12 +11,16 @@ import (
 	"code"
 )
 
+// BinaryName is the command name used by the CLI.
 const BinaryName = "gendiff"
+
+// Exit codes returned by Execute.
 const (
 	ExitOK    = 0
 	ExitError = 1
 )
 
+// Run parses CLI arguments and runs the diff command.
 func Run(args []string) error {
 	cmd := &cli.Command{
 		Name:      BinaryName,
@@ -51,9 +56,13 @@ func Run(args []string) error {
 	return cmd.Run(context.Background(), args)
 }
 
+// Execute runs the CLI and returns a process exit code.
 func Execute(args []string, stderr io.Writer) int {
 	if err := Run(args); err != nil {
-		fmt.Fprintln(stderr, err)
+		if _, writeErr := fmt.Fprintln(stderr, err); writeErr != nil {
+			return ExitError
+		}
+
 		return ExitError
 	}
 
