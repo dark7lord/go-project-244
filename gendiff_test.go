@@ -8,6 +8,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"code/internal/formatters"
 )
 
 func readFileToString(t *testing.T, path string) string {
@@ -37,7 +39,7 @@ const (
 	expectedACDiff = "expected/expectedAC.diff"
 	expectedCDDiff = "expected/expectedCD.diff"
 	expectedAADiff = "expected/expectedAA.diff"
-		expectedEFDiff = "expected/expectedEF.diff"
+	expectedEFDiff = "expected/expectedEF.diff"
 )
 
 func fixturePath(name string) string {
@@ -93,11 +95,11 @@ func TestGendiff(t *testing.T) {
 			pathB:        fixturePath(fixtureNestedBJSON),
 			expectedPath: fixturePath(expectedEFDiff),
 		},
-		}
+	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := GenDiff(tt.pathA, tt.pathB, "stylish")
+			result, err := GenDiff(tt.pathA, tt.pathB, string(formatters.Stylish))
 			require.NoError(t, err)
 			actual := strings.TrimSpace(result)
 			expected := readFileToString(t, tt.expectedPath)
@@ -120,16 +122,17 @@ func TestGenDiffErrors(t *testing.T) {
 			name:        "invalid first file",
 			pathA:       fixturePath(fixtureInvalidJSON),
 			pathB:       fixturePath(fixtureFlatAJSON),
-			format:      "stylish",
+			format:      string(formatters.Stylish),
 			expectedErr: "",
 		},
 		{
 			name:        "invalid second file",
 			pathA:       fixturePath(fixtureFlatAJSON),
 			pathB:       fixturePath(fixtureInvalidYAML),
-			format:      "stylish",
+			format:      string(formatters.Stylish),
 			expectedErr: "",
-		}, {
+		},
+		{
 			name:        "unsupported format",
 			pathA:       fixturePath(fixtureFlatAJSON),
 			pathB:       fixturePath(fixtureFlatBJSON),
@@ -140,7 +143,7 @@ func TestGenDiffErrors(t *testing.T) {
 			name:        "array root in first file",
 			pathA:       fixturePath(fixtureSameAJSON),
 			pathB:       fixturePath(fixtureFlatAJSON),
-			format:      "stylish",
+			format:      string(formatters.Stylish),
 			expectedErr: "cannot unmarshal array into Go value of type map[string]interface {}",
 			contains:    true,
 		},
@@ -148,7 +151,7 @@ func TestGenDiffErrors(t *testing.T) {
 			name:        "array root in second file",
 			pathA:       fixturePath(fixtureFlatAJSON),
 			pathB:       fixturePath(fixtureSameBJSON),
-			format:      "stylish",
+			format:      string(formatters.Stylish),
 			expectedErr: "cannot unmarshal array into Go value of type map[string]interface {}",
 			contains:    true,
 		},
