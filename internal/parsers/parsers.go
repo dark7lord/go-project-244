@@ -13,9 +13,10 @@ import (
 
 // ErrUnsupportedFileType is returned when the file type is not supported
 var ErrUnsupportedFileType = errors.New("unsupported file type")
+var ErrUnsupportedRootType = errors.New("unsupported root type: expected map[string]any")
 
-func parseJSON(data []byte) (any, error) {
-	var result any
+func parseJSON(data []byte) (map[string]any, error) {
+	var result map[string]any
 
 	if err := json.Unmarshal(data, &result); err != nil {
 		return nil, err
@@ -24,14 +25,20 @@ func parseJSON(data []byte) (any, error) {
 	return result, nil
 }
 
-func parseYAML(data []byte) (any, error) {
-	var result any
+func parseYAML(data []byte) (map[string]any, error) {
+	var result map[string]any
 
 	if err := yaml.Unmarshal(data, &result); err != nil {
 		return nil, err
 	}
 
-	return normalizeYAML(result), nil
+	normalized := normalizeYAML(result)
+	m, ok := normalized.(map[string]any)
+	if !ok {
+		return nil, ErrUnsupportedRootType
+	}
+
+	return m, nil
 }
 
 func normalizeYAML(v any) any {
@@ -57,6 +64,15 @@ func normalizeYAML(v any) any {
 	}
 }
 
+func ensureMap(v any) (map[string]any, error) {
+	m, ok := v.(map[string]any)
+	if !ok {
+		return nil, ErrUnsupportedRootType
+	}
+
+	return m, nil
+}
+
 func parseError(path, ext, op string, err error) error {
 	if err == nil {
 		return nil
@@ -66,7 +82,7 @@ func parseError(path, ext, op string, err error) error {
 }
 
 // Parse function returns a parsed JSON/YAML structure
-func Parse(path string) (any, error) {
+func Parse(path string) (map[string]any, error) {
 	ext := filepath.Ext(path)
 
 	fileInfo, err := os.Stat(path)
@@ -90,10 +106,16 @@ func Parse(path string) (any, error) {
 	switch ext {
 	case ".json":
 		value, err := parseJSON(fileBytes)
-		return value, parseError(path, ext, "parse", err)
+		if err != nil {
+			return nil, parseError(path, ext, "parse", err)
+		}
+		return ensureMap(value)
 	case ".yml", ".yaml":
 		value, err := parseYAML(fileBytes)
-		return value, parseError(path, ext, "parse", err)
+		if err != nil {
+			return nil, parseError(path, ext, "parse", err)
+		}
+		return ensureMap(value)
 	default:
 		return nil, fmt.Errorf("parser: path=%q type=%q: %w", path, ext, ErrUnsupportedFileType)
 	}

@@ -164,3 +164,34 @@ func TestParsePermissionDenied(t *testing.T) {
 	require.Error(t, err)
 	assert.True(t, errors.Is(err, os.ErrPermission))
 }
+
+func TestParseRejectsRootArray(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "test")
+	require.NoError(t, err)
+
+	defer func() {
+		err := os.RemoveAll(tempDir)
+		if err != nil {
+			t.Logf("failed to remove temp directory: %v", err)
+		}
+	}()
+
+	cases := []struct {
+		name string
+		path string
+		data []byte
+	}{
+		{name: "json array", path: filepath.Join(tempDir, "array.json"), data: []byte(`["a", "b"]`)},
+		{name: "yaml array", path: filepath.Join(tempDir, "array.yaml"), data: []byte("- a\n- b\n")},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			require.NoError(t, os.WriteFile(tt.path, tt.data, 0o644))
+
+			_, err := Parse(tt.path)
+			require.Error(t, err)
+			assert.True(t, errors.Is(err, ErrUnsupportedRootType) || assert.ErrorContains(t, err, "cannot unmarshal"))
+		})
+	}
+}

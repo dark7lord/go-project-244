@@ -37,9 +37,7 @@ const (
 	expectedACDiff = "expected/expectedAC.diff"
 	expectedCDDiff = "expected/expectedCD.diff"
 	expectedAADiff = "expected/expectedAA.diff"
-	expectedEFDiff = "expected/expectedEF.diff"
-	expectedGGDiff = "expected/expectedGG.diff"
-	expectedGHDiff = "expected/expectedGH.diff"
+		expectedEFDiff = "expected/expectedEF.diff"
 )
 
 func fixturePath(name string) string {
@@ -95,19 +93,7 @@ func TestGendiff(t *testing.T) {
 			pathB:        fixturePath(fixtureNestedBJSON),
 			expectedPath: fixturePath(expectedEFDiff),
 		},
-		{
-			name:         "GG same files",
-			pathA:        fixturePath(fixtureSameAJSON),
-			pathB:        fixturePath(fixtureSameAJSON),
-			expectedPath: fixturePath(expectedGGDiff),
-		},
-		{
-			name:         "GH identical files",
-			pathA:        fixturePath(fixtureSameAJSON),
-			pathB:        fixturePath(fixtureSameBJSON),
-			expectedPath: fixturePath(expectedGHDiff),
-		},
-	}
+		}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -128,6 +114,7 @@ func TestGenDiffErrors(t *testing.T) {
 		pathB       string
 		format      string
 		expectedErr string
+		contains    bool
 	}{
 		{
 			name:        "invalid first file",
@@ -149,6 +136,22 @@ func TestGenDiffErrors(t *testing.T) {
 			format:      "xml",
 			expectedErr: "unsupported format: xml",
 		},
+		{
+			name:        "array root in first file",
+			pathA:       fixturePath(fixtureSameAJSON),
+			pathB:       fixturePath(fixtureFlatAJSON),
+			format:      "stylish",
+			expectedErr: "cannot unmarshal array into Go value of type map[string]interface {}",
+			contains:    true,
+		},
+		{
+			name:        "array root in second file",
+			pathA:       fixturePath(fixtureFlatAJSON),
+			pathB:       fixturePath(fixtureSameBJSON),
+			format:      "stylish",
+			expectedErr: "cannot unmarshal array into Go value of type map[string]interface {}",
+			contains:    true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -157,6 +160,12 @@ func TestGenDiffErrors(t *testing.T) {
 
 			if tt.expectedErr == "" {
 				require.Error(t, err)
+				assert.Empty(t, result)
+				return
+			}
+
+			if tt.contains {
+				require.ErrorContains(t, err, tt.expectedErr)
 				assert.Empty(t, result)
 				return
 			}
