@@ -34,13 +34,7 @@ func parseYAML(data []byte) (map[string]any, error) {
 		return nil, err
 	}
 
-	normalized := normalizeYAML(result)
-	m, ok := normalized.(map[string]any)
-	if !ok {
-		return nil, ErrUnsupportedRootType
-	}
-
-	return m, nil
+	return ensureMap(normalizeYAML(result))
 }
 
 func normalizeYAML(v any) any {
@@ -76,10 +70,6 @@ func ensureMap(v any) (map[string]any, error) {
 }
 
 func parseError(path, ext, op string, err error) error {
-	if err == nil {
-		return nil
-	}
-
 	return fmt.Errorf("parse error: path=%q type=%q %s: %w", path, ext, op, err)
 }
 

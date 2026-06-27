@@ -165,6 +165,26 @@ func TestParsePermissionDenied(t *testing.T) {
 	assert.True(t, errors.Is(err, os.ErrPermission))
 }
 
+func TestEnsureMapRejectsNonMap(t *testing.T) {
+	_, err := ensureMap("string")
+	assert.ErrorIs(t, err, ErrUnsupportedRootType)
+
+	_, err = ensureMap([]any{1})
+	assert.ErrorIs(t, err, ErrUnsupportedRootType)
+
+	_, err = ensureMap(42)
+	assert.ErrorIs(t, err, ErrUnsupportedRootType)
+
+	_, err = ensureMap(nil)
+	assert.ErrorIs(t, err, ErrUnsupportedRootType)
+}
+
+func TestEnsureMapAcceptsMap(t *testing.T) {
+	result, err := ensureMap(map[string]any{"a": 1})
+	assert.NoError(t, err)
+	assert.Equal(t, map[string]any{"a": 1}, result)
+}
+
 func TestParseRejectsRootArray(t *testing.T) {
 	tempDir, err := os.MkdirTemp("", "test")
 	require.NoError(t, err)
@@ -191,7 +211,7 @@ func TestParseRejectsRootArray(t *testing.T) {
 
 			_, err := Parse(tt.path)
 			require.Error(t, err)
-			assert.True(t, errors.Is(err, ErrUnsupportedRootType) || assert.ErrorContains(t, err, "cannot unmarshal"))
+			assert.ErrorContains(t, err, "cannot unmarshal")
 		})
 	}
 }

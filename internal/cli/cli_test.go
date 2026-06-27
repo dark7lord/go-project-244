@@ -49,6 +49,18 @@ func TestRun(t *testing.T) {
 	}
 }
 
+func TestExecuteSuccess(t *testing.T) {
+	var stderr bytes.Buffer
+
+	got := Execute([]string{
+		BinaryName,
+		filepath.Join("..", "..", "testdata", "fixtures", "flat", "fileA.json"),
+		filepath.Join("..", "..", "testdata", "fixtures", "flat", "fileB.json"),
+	}, &stderr)
+
+	require.Equal(t, ExitOK, got)
+}
+
 func TestExecuteExitsWithError(t *testing.T) {
 	var stderr bytes.Buffer
 
