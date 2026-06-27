@@ -1,7 +1,7 @@
-package main
+package cli
 
 import (
-	"os"
+	"bytes"
 	"path/filepath"
 	"testing"
 
@@ -17,26 +17,26 @@ func TestRun(t *testing.T) {
 		{
 			name: "success",
 			args: []string{
-				binaryName,
+				BinaryName,
 				filepath.Join("..", "..", "testdata", "fixtures", "flat", "fileA.json"),
 				filepath.Join("..", "..", "testdata", "fixtures", "flat", "fileB.json"),
 			},
 		},
 		{
 			name:    "invalid args",
-			args:    []string{binaryName, "fileA.json"},
+			args:    []string{BinaryName, "fileA.json"},
 			wantErr: "expected 2 file paths, got 1",
 		},
 		{
 			name:    "gen diff error",
-			args:    []string{binaryName, "nonexistent.json", "alsonothere.json"},
+			args:    []string{BinaryName, "nonexistent.json", "alsonothere.json"},
 			wantErr: "*",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := run(tt.args)
+			err := Run(tt.args)
 			switch tt.wantErr {
 			case "":
 				require.NoError(t, err)
@@ -49,30 +49,11 @@ func TestRun(t *testing.T) {
 	}
 }
 
-func TestMainExitsWithError(t *testing.T) {
-	defer func() { osExit = os.Exit }()
+func TestExecuteExitsWithError(t *testing.T) {
+	var stderr bytes.Buffer
 
-	var got int
-	osExit = func(code int) { got = code }
-
-	os.Args = []string{binaryName, "fileA.json"}
-	main()
+	got := Execute([]string{"gendiff", "fileA.json"}, &stderr)
 
 	require.Equal(t, ExitError, got)
-}
-
-func TestMainExitsWithSuccess(t *testing.T) {
-	defer func() { osExit = os.Exit }()
-
-	var got int
-	osExit = func(code int) { got = code }
-
-	os.Args = []string{
-		binaryName,
-		filepath.Join("..", "..", "testdata", "fixtures", "flat", "fileA.json"),
-		filepath.Join("..", "..", "testdata", "fixtures", "flat", "fileB.json"),
-	}
-	main()
-
-	require.Equal(t, ExitOK, got)
+	require.Contains(t, stderr.String(), "expected 2 file paths, got 1")
 }
