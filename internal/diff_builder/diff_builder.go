@@ -55,22 +55,22 @@ func isEqual(a, b any) bool {
 	return false
 }
 
-func getDiffKeys(oldMap, newMap map[string]any) (removed, added, common []string) {
-	lenA, lenB := len(oldMap), len(newMap)
-	removed = make([]string, 0, lenA)
-	added = make([]string, 0, lenB)
-	common = make([]string, 0, max(lenA, lenB))
+func getDiffKeys(left, right map[string]any) (removed, added, common []string) {
+	leftLen, rightLen := len(left), len(right)
+	removed = make([]string, 0, leftLen)
+	added = make([]string, 0, rightLen)
+	common = make([]string, 0, max(leftLen, rightLen))
 
-	for k := range oldMap {
-		if _, ok := newMap[k]; ok {
+	for k := range left {
+		if _, ok := right[k]; ok {
 			common = append(common, k)
 		} else {
 			removed = append(removed, k)
 		}
 	}
 
-	for k := range newMap {
-		if _, ok := oldMap[k]; !ok {
+	for k := range right {
+		if _, ok := left[k]; !ok {
 			added = append(added, k)
 		}
 	}
@@ -78,38 +78,38 @@ func getDiffKeys(oldMap, newMap map[string]any) (removed, added, common []string
 	return removed, added, common
 }
 
-func genMapDiff(oldMap, newMap map[string]any) diff.Node {
-	removed, added, common := getDiffKeys(oldMap, newMap)
+func buildObjectDiff(left, right map[string]any) diff.Node {
+	removed, added, common := getDiffKeys(left, right)
 	allKeys := append(append(removed, added...), common...)
 	slices.Sort(allKeys)
 
 	nodes := make([]diff.Node, 0, len(allKeys))
 
 	for _, key := range allKeys {
-		_, inOld := oldMap[key]
-		_, inNew := newMap[key]
+		_, isInLeft := left[key]
+		_, isInRight := right[key]
 
 		switch {
-		case inOld && !inNew:
+		case isInLeft && !isInRight:
 			nodes = append(nodes, diff.Node{
 				Key:      key,
 				TypeDiff: diff.Removed,
-				OldValue: oldMap[key],
+				OldValue: left[key],
 			})
-		case !inOld && inNew:
+		case !isInLeft && isInRight:
 			nodes = append(nodes, diff.Node{
 				Key:      key,
 				TypeDiff: diff.Added,
-				NewValue: newMap[key],
+				NewValue: right[key],
 			})
 		default:
-			oldVal := oldMap[key]
-			newVal := newMap[key]
+			leftValue := left[key]
+			rightValue := right[key]
 
-			node := RecursiveGendiff(oldVal, newVal)
+			node := BuildDiffTree(leftValue, rightValue)
 			node.Key = key
 
-			if !isEqual(oldVal, newVal) {
+			if !isEqual(leftValue, rightValue) {
 				typeDiff := diff.Changed
 
 				if len(node.Children) > 0 {
@@ -146,21 +146,20 @@ func buildDiff(typeDiff diff.Kind, oldValue, newValue any) diff.Node {
 	return result
 }
 
-// RecursiveGendiff function recursively generates a diff between two data structures,
-// which can be maps or slices, and returns the resulting diff structure
-func RecursiveGendiff(oldData, newData any) diff.Node {
-	oldVal, isOldMap := oldData.(map[string]any)
-	newVal, isNewMap := newData.(map[string]any)
+// BuildDiffTree builds a diff tree between two parsed data structures.
+func BuildDiffTree(left, right any) diff.Node {
+	leftObject, isLeftObject := left.(map[string]any)
+	rightObject, isRightObject := right.(map[string]any)
 
-	if isOldMap && isNewMap {
-		return genMapDiff(oldVal, newVal)
+	if isLeftObject && isRightObject {
+		return buildObjectDiff(leftObject, rightObject)
 	}
 
 	typeDiff := diff.Unchanged
 
-	if !isEqual(oldData, newData) {
+	if !isEqual(left, right) {
 		typeDiff = diff.Changed
 	}
 
-	return buildDiff(typeDiff, oldData, newData)
+	return buildDiff(typeDiff, left, right)
 }

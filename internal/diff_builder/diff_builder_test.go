@@ -21,52 +21,52 @@ func nestedDiff(children ...diff.Node) diff.Node {
 	}
 }
 
-func TestGenMapDiff(t *testing.T) {
+func TestBuildObjectDiff(t *testing.T) {
 	tests := []struct {
-		name string
-		mapA map[string]any
-		mapB map[string]any
-		want diff.Node
+		name  string
+		left  map[string]any
+		right map[string]any
+		want  diff.Node
 	}{
 		{
-			name: "flat add",
-			mapA: map[string]any{},
-			mapB: map[string]any{testKey: 42.0},
+			name:  "flat add",
+			left:  map[string]any{},
+			right: map[string]any{testKey: 42.0},
 			want: nestedDiff(
 				diff.Node{Key: testKey, TypeDiff: diff.Added, NewValue: 42.0},
 			),
 		},
 		{
-			name: "flat remove",
-			mapA: map[string]any{testKey: "value"},
-			mapB: map[string]any{},
+			name:  "flat remove",
+			left:  map[string]any{testKey: "value"},
+			right: map[string]any{},
 			want: nestedDiff(
 				diff.Node{
 					Key: testKey, TypeDiff: diff.Removed, OldValue: "value"},
 			),
 		},
 		{
-			name: "flat changed",
-			mapA: map[string]any{testKey: true},
-			mapB: map[string]any{testKey: false},
+			name:  "flat changed",
+			left:  map[string]any{testKey: true},
+			right: map[string]any{testKey: false},
 			want: nestedDiff(
 				diff.Node{
 					Key: testKey, TypeDiff: diff.Changed, OldValue: true, NewValue: false},
 			),
 		},
 		{
-			name: "flat unchanged",
-			mapA: map[string]any{testKey: nil},
-			mapB: map[string]any{testKey: nil},
+			name:  "flat unchanged",
+			left:  map[string]any{testKey: nil},
+			right: map[string]any{testKey: nil},
 			want: nestedDiff(
 				diff.Node{
 					Key: testKey, TypeDiff: diff.Unchanged, OldValue: nil},
 			),
 		},
 		{
-			name: "nested object",
-			mapA: map[string]any{testNested: map[string]any{"a": 1.0}},
-			mapB: map[string]any{testNested: map[string]any{"a": 1.0, "b": 2.0}},
+			name:  "nested object",
+			left:  map[string]any{testNested: map[string]any{"a": 1.0}},
+			right: map[string]any{testNested: map[string]any{"a": 1.0, "b": 2.0}},
 			want: nestedDiff(
 				diff.Node{
 					Key:      testNested,
@@ -79,9 +79,9 @@ func TestGenMapDiff(t *testing.T) {
 			),
 		},
 		{
-			name: "nested array",
-			mapA: map[string]any{testArrayKey: []any{1.0, 2.0}},
-			mapB: map[string]any{testArrayKey: []any{1.0, 3.0, 4.0}},
+			name:  "nested array",
+			left:  map[string]any{testArrayKey: []any{1.0, 2.0}},
+			right: map[string]any{testArrayKey: []any{1.0, 3.0, 4.0}},
 			want: nestedDiff(
 				diff.Node{
 					Key:      testArrayKey,
@@ -95,7 +95,7 @@ func TestGenMapDiff(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := genMapDiff(tt.mapA, tt.mapB)
+			got := buildObjectDiff(tt.left, tt.right)
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -184,7 +184,7 @@ func TestBuildDiff(t *testing.T) {
 	)
 }
 
-func TestRecursiveGendiff(t *testing.T) {
+func TestBuildDiffTree(t *testing.T) {
 	tests := []struct {
 		name string
 		a    any
@@ -215,7 +215,7 @@ func TestRecursiveGendiff(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, RecursiveGendiff(tt.a, tt.b))
+			assert.Equal(t, tt.want, BuildDiffTree(tt.a, tt.b))
 		})
 	}
 }

@@ -19,7 +19,7 @@ func GenDiff(pathA, pathB, format string) (string, error) {
 		return "", err
 	}
 
-	diff := diff_builder.RecursiveGendiff(dataA, dataB)
+	diff := diff_builder.BuildDiffTree(dataA, dataB)
 
 	return formatters.Format(format, diff)
 }
