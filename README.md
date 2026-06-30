@@ -58,14 +58,12 @@ The `--format` flag supports three output styles:
 Quick examples:
 
 ```bash
-gendiff fileA.json fileB.json
-gendiff --format plain fileA.json fileB.json
-gendiff --format json fileA.json fileB.json
+gendiff testdata/fixtures/flat/fileA.json testdata/fixtures/flat/fileB.json
+gendiff --format plain testdata/fixtures/flat/fileA.json testdata/fixtures/flat/fileB.json
+gendiff --format json testdata/fixtures/flat/fileA.json testdata/fixtures/flat/fileB.json
 ```
 
 ## Examples
-
-*All examples run from the project root. Test files are in `testdata/fixtures/`.*
 
 ### Flat files
 
@@ -91,7 +89,7 @@ gendiff --format json fileA.json fileB.json
 #### stylish (default)
 
 ```bash
-gendiff fileA.json fileB.json
+gendiff testdata/fixtures/flat/fileA.json testdata/fixtures/flat/fileB.json
 ```
 
 ```diff
@@ -110,7 +108,7 @@ gendiff fileA.json fileB.json
 #### plain
 
 ```bash
-gendiff --format plain fileA.json fileB.json
+gendiff --format plain testdata/fixtures/flat/fileA.json testdata/fixtures/flat/fileB.json
 ```
 
 ```
@@ -125,43 +123,51 @@ Property 'verbose' was added with value: true
 #### json
 
 ```bash
-gendiff --format json fileA.json fileB.json
+gendiff --format json testdata/fixtures/flat/fileA.json testdata/fixtures/flat/fileB.json
 ```
 
 ```json
 {
-  "follow": {
-    "type": "removed",
-    "value": false
-  },
-  "host": {
-    "type": "unchanged",
-    "value": "hexlet.io"
-  },
-  "proxy": {
-    "type": "removed",
-    "value": "123.234.53.22"
-  },
-  "timeout": {
-    "type": "changed",
-    "oldValue": 50,
-    "newValue": 20
-  },
-  "verbose": {
-    "type": "added",
-    "value": true
-  }
+  "type": "nested",
+  "children": [
+    {
+      "key": "follow",
+      "type": "removed",
+      "oldValue": false
+    },
+    {
+      "key": "host",
+      "type": "unchanged",
+      "oldValue": "hexlet.io"
+    },
+    {
+      "key": "proxy",
+      "type": "removed",
+      "oldValue": "123.234.53.22"
+    },
+    {
+      "key": "timeout",
+      "type": "changed",
+      "oldValue": 50,
+      "newValue": 20
+    },
+    {
+      "key": "verbose",
+      "type": "added",
+      "newValue": true
+    }
+  ]
 }
 ```
 
-[![asciicast](https://asciinema.org/a/wTgFtwRsjKA5wPbE.svg)](https://asciinema.org/a/wTgFtwRsjKA5wPbE)
+[![asciicast](https://asciinema.org/a/tnLGd7CaG0CGtdVz.svg)](https://asciinema.org/a/tnLGd7CaG0CGtdVz)
 
 #### YAML
 
 Same tree output as stylish, with `.yml` input files:
 
 ```bash
-gendiff fileA.yml fileB.yml
+gendiff testdata/fixtures/flat/fileA.yml testdata/fixtures/flat/fileB.yml
 ```
 
 [![asciicast](https://asciinema.org/a/KwRoX2hqVMcU3boD.svg)](https://asciinema.org/a/KwRoX2hqVMcU3boD)
@@ -238,7 +244,7 @@ gendiff fileA.yml fileB.yml
 #### stylish
 
 ```bash
-gendiff fileE.json fileF.json
+gendiff testdata/fixtures/nested/fileE.json testdata/fixtures/nested/fileF.json
 ```
 
 ```diff
@@ -266,20 +272,34 @@ gendiff fileE.json fileF.json
       - baz: bas
       + baz: bars
         foo: bar
-      - nest: { key: value }
+      - nest: {
+            key: value
+        }
       + nest: str
     }
-  - group2: { abc: 12345, deep: { id: 45 } }
-  + group3: { deep: { id: { number: 45 } }, fee: 100500 }
+  - group2: {
+        abc: 12345
+        deep: {
+            id: 45
+        }
+    }
+  + group3: {
+        deep: {
+            id: {
+                number: 45
+            }
+        }
+        fee: 100500
+    }
 }
 ```
 
-[![asciicast](https://asciinema.org/a/JDROAWxn7BHD8kRW.svg)](https://asciinema.org/a/JDROAWxn7BHD8kRW)
+[![asciicast](https://asciinema.org/a/guFjzdnfBhjtX1Bs.svg)](https://asciinema.org/a/guFjzdnfBhjtX1Bs)
 
 #### plain
 
 ```bash
-gendiff --format plain fileE.json fileF.json
+gendiff --format plain testdata/fixtures/nested/fileE.json testdata/fixtures/nested/fileF.json
 ```
 
 ```
@@ -301,111 +321,132 @@ Property 'group3' was added with value: [complex value]
 #### json
 
 ```bash
-gendiff --format json fileE.json fileF.json
+gendiff --format json testdata/fixtures/nested/fileE.json testdata/fixtures/nested/fileF.json
 ```
 
 ```json
 {
-  "common": {
-    "type": "nested",
-    "children": {
-      "follow": {
-        "type": "added",
-        "value": false
-      },
-      "setting1": {
-        "type": "unchanged",
-        "value": "Value 1"
-      },
-      "setting2": {
-        "type": "removed",
-        "value": 200
-      },
-      "setting3": {
-        "newValue": null,
-        "oldValue": true,
-        "type": "changed"
-      },
-      "setting4": {
-        "type": "added",
-        "value": "blah blah"
-      },
-      "setting5": {
-        "type": "added",
-        "value": {
-          "key5": "value5"
-        }
-      },
-      "setting6": {
-        "type": "nested",
-        "children": {
-          "doge": {
-            "type": "nested",
-            "children": {
-              "wow": {
-                "newValue": "so much",
-                "oldValue": "",
-                "type": "changed"
-              }
-            }
-          },
-          "key": {
-            "type": "unchanged",
-            "value": "value"
-          },
-          "ops": {
-            "type": "added",
-            "value": "vops"
-          }
-        }
-      }
-    }
-  },
-  "group1": {
-    "type": "nested",
-    "children": {
-      "baz": {
-        "newValue": "bars",
-        "oldValue": "bas",
-        "type": "changed"
-      },
-      "foo": {
-        "type": "unchanged",
-        "value": "bar"
-      },
-      "nest": {
-        "newValue": "str",
-        "oldValue": {
-          "key": "value"
+  "type": "nested",
+  "children": [
+    {
+      "key": "common",
+      "type": "nested",
+      "children": [
+        {
+          "key": "follow",
+          "type": "added",
+          "newValue": false
         },
-        "type": "changed"
-      }
-    }
-  },
-  "group2": {
-    "type": "removed",
-    "value": {
-      "abc": 12345,
-      "deep": {
-        "id": 45
-      }
-    }
-  },
-  "group3": {
-    "type": "added",
-    "value": {
-      "deep": {
-        "id": {
-          "number": 45
+        {
+          "key": "setting1",
+          "type": "unchanged",
+          "oldValue": "Value 1"
+        },
+        {
+          "key": "setting2",
+          "type": "removed",
+          "oldValue": 200
+        },
+        {
+          "key": "setting3",
+          "type": "changed",
+          "oldValue": true,
+          "newValue": null
+        },
+        {
+          "key": "setting4",
+          "type": "added",
+          "newValue": "blah blah"
+        },
+        {
+          "key": "setting5",
+          "type": "added",
+          "newValue": {
+            "key5": "value5"
+          }
+        },
+        {
+          "key": "setting6",
+          "type": "nested",
+          "children": [
+            {
+              "key": "doge",
+              "type": "nested",
+              "children": [
+                {
+                  "key": "wow",
+                  "type": "changed",
+                  "oldValue": "",
+                  "newValue": "so much"
+                }
+              ]
+            },
+            {
+              "key": "key",
+              "type": "unchanged",
+              "oldValue": "value"
+            },
+            {
+              "key": "ops",
+              "type": "added",
+              "newValue": "vops"
+            }
+          ]
         }
-      },
-      "fee": 100500
+      ]
+    },
+    {
+      "key": "group1",
+      "type": "nested",
+      "children": [
+        {
+          "key": "baz",
+          "type": "changed",
+          "oldValue": "bas",
+          "newValue": "bars"
+        },
+        {
+          "key": "foo",
+          "type": "unchanged",
+          "oldValue": "bar"
+        },
+        {
+          "key": "nest",
+          "type": "changed",
+          "oldValue": {
+            "key": "value"
+          },
+          "newValue": "str"
+        }
+      ]
+    },
+    {
+      "key": "group2",
+      "type": "removed",
+      "oldValue": {
+        "abc": 12345,
+        "deep": {
+          "id": 45
+        }
+      }
+    },
+    {
+      "key": "group3",
+      "type": "added",
+      "newValue": {
+        "deep": {
+          "id": {
+            "number": 45
+          }
+        },
+        "fee": 100500
+      }
     }
-  }
+  ]
 }
 ```
 
-[![asciicast](https://asciinema.org/a/S2G5LZfO4csOrVh6.svg)](https://asciinema.org/a/S2G5LZfO4csOrVh6)
+[![asciicast](https://asciinema.org/a/EDCJBEiTDZ56TbEW.svg)](https://asciinema.org/a/EDCJBEiTDZ56TbEW)
 
 ## Development
 
