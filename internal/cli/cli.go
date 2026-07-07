@@ -4,7 +4,6 @@ package cli
 import (
 	"context"
 	"fmt"
-	"io"
 
 	"github.com/urfave/cli/v3"
 
@@ -20,9 +19,9 @@ const (
 	ExitError = 1
 )
 
-// Run parses CLI arguments and runs the diff command.
-func Run(args []string) error {
-	cmd := &cli.Command{
+// NewCommand builds and configures the CLI command.
+func NewCommand() *cli.Command {
+	return &cli.Command{
 		Name:      BinaryName,
 		Usage:     "Compares two configuration files...",
 		ArgsUsage: "<old_file> <new_file>",
@@ -52,19 +51,4 @@ func Run(args []string) error {
 			return nil
 		},
 	}
-
-	return cmd.Run(context.Background(), args)
-}
-
-// Execute runs the CLI and returns a process exit code.
-func Execute(args []string, stderr io.Writer) int {
-	if err := Run(args); err != nil {
-		if _, writeErr := fmt.Fprintln(stderr, err); writeErr != nil {
-			return ExitError
-		}
-
-		return ExitError
-	}
-
-	return ExitOK
 }

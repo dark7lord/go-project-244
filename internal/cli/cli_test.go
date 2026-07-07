@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"bytes"
+	"context"
 	"path/filepath"
 	"testing"
 
@@ -36,7 +36,7 @@ func TestRun(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := Run(tt.args)
+			err := NewCommand().Run(context.Background(), tt.args)
 			switch tt.wantErr {
 			case "":
 				require.NoError(t, err)
@@ -49,23 +49,4 @@ func TestRun(t *testing.T) {
 	}
 }
 
-func TestExecuteSuccess(t *testing.T) {
-	var stderr bytes.Buffer
 
-	got := Execute([]string{
-		BinaryName,
-		filepath.Join("..", "..", "testdata", "fixtures", "flat", "fileA.json"),
-		filepath.Join("..", "..", "testdata", "fixtures", "flat", "fileB.json"),
-	}, &stderr)
-
-	require.Equal(t, ExitOK, got)
-}
-
-func TestExecuteExitsWithError(t *testing.T) {
-	var stderr bytes.Buffer
-
-	got := Execute([]string{"gendiff", "fileA.json"}, &stderr)
-
-	require.Equal(t, ExitError, got)
-	require.Contains(t, stderr.String(), "expected 2 file paths, got 1")
-}
