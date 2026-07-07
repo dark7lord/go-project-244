@@ -2,86 +2,30 @@
 package diff_builder
 
 import (
+	"reflect"
 	"slices"
 
 	"code/internal/diff"
 )
 
-func isEqual(a, b any) bool {
-	switch va := a.(type) {
-	case []any:
-		vb, ok := b.([]any)
-		if !ok || len(va) != len(vb) {
-			return false
-		}
-		for i := range va {
-			if !isEqual(va[i], vb[i]) {
-				return false
-			}
-		}
-
-		return true
-
-	case map[string]any:
-		vb, ok := b.(map[string]any)
-		if !ok || len(va) != len(vb) {
-			return false
-		}
-		for key, valA := range va {
-			valB, exists := vb[key]
-			if !exists || !isEqual(valA, valB) {
-				return false
-			}
-		}
-
-		return true
-
-	case float64:
-		vb, ok := b.(float64)
-		return ok && va == vb
-
-	case string:
-		vb, ok := b.(string)
-		return ok && va == vb
-
-	case bool:
-		vb, ok := b.(bool)
-		return ok && va == vb
-
-	case nil:
-		return b == nil
-	}
-
-	return false
-}
-
-func getDiffKeys(left, right map[string]any) (removed, added, common []string) {
-	leftLen, rightLen := len(left), len(right)
-	removed = make([]string, 0, leftLen)
-	added = make([]string, 0, rightLen)
-	common = make([]string, 0, max(leftLen, rightLen))
+func collectObjectKeys(left, right map[string]any) []string {
+	allKeys := make([]string, 0, len(left)+len(right))
 
 	for k := range left {
-		if _, ok := right[k]; ok {
-			common = append(common, k)
-		} else {
-			removed = append(removed, k)
-		}
+		allKeys = append(allKeys, k)
 	}
 
 	for k := range right {
-		if _, ok := left[k]; !ok {
-			added = append(added, k)
-		}
+		allKeys = append(allKeys, k)
 	}
 
-	return removed, added, common
+	slices.Sort(allKeys)
+
+	return slices.Compact(allKeys)
 }
 
 func buildObjectDiff(left, right map[string]any) diff.Node {
-	removed, added, common := getDiffKeys(left, right)
-	allKeys := append(append(removed, added...), common...)
-	slices.Sort(allKeys)
+	allKeys := collectObjectKeys(left, right)
 
 	nodes := make([]diff.Node, 0, len(allKeys))
 
@@ -96,12 +40,14 @@ func buildObjectDiff(left, right map[string]any) diff.Node {
 				TypeDiff: diff.Removed,
 				OldValue: left[key],
 			})
+
 		case !isInLeft && isInRight:
 			nodes = append(nodes, diff.Node{
 				Key:      key,
 				TypeDiff: diff.Added,
 				NewValue: right[key],
 			})
+
 		default:
 			leftValue := left[key]
 			rightValue := right[key]
@@ -109,7 +55,7 @@ func buildObjectDiff(left, right map[string]any) diff.Node {
 			node := BuildDiffTree(leftValue, rightValue)
 			node.Key = key
 
-			if !isEqual(leftValue, rightValue) {
+			if !reflect.DeepEqual(leftValue, rightValue) {
 				typeDiff := diff.Changed
 
 				if len(node.Children) > 0 {
@@ -157,7 +103,7 @@ func BuildDiffTree(left, right any) diff.Node {
 
 	typeDiff := diff.Unchanged
 
-	if !isEqual(left, right) {
+	if !reflect.DeepEqual(left, right) {
 		typeDiff = diff.Changed
 	}
 
