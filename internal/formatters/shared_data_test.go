@@ -8,17 +8,6 @@ const (
 	testNamePrimitiveValue = "value"
 )
 
-const singleAddedNodeJSON = `{
-		"type": "nested",
-		"children": [
-			{
-				"key": "Key",
-				"type": "added",
-				"newValue": "value"
-			}
-		]
-	}`
-
 func singleAddedDiff() diff.Node {
 	return diff.Node{
 		TypeDiff: diff.Nested,

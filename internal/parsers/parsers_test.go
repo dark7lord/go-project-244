@@ -166,17 +166,22 @@ func TestParsePermissionDenied(t *testing.T) {
 }
 
 func TestEnsureMapRejectsNonMap(t *testing.T) {
-	_, err := ensureMap("string")
-	assert.ErrorIs(t, err, ErrUnsupportedRootType)
+	tests := []struct {
+		name string
+		v    any
+	}{
+		{name: "string", v: "string"},
+		{name: "slice", v: []any{1}},
+		{name: "int", v: 42},
+		{name: "nil", v: nil},
+	}
 
-	_, err = ensureMap([]any{1})
-	assert.ErrorIs(t, err, ErrUnsupportedRootType)
-
-	_, err = ensureMap(42)
-	assert.ErrorIs(t, err, ErrUnsupportedRootType)
-
-	_, err = ensureMap(nil)
-	assert.ErrorIs(t, err, ErrUnsupportedRootType)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := ensureMap(tt.v)
+			assert.ErrorIs(t, err, ErrUnsupportedRootType)
+		})
+	}
 }
 
 func TestEnsureMapAcceptsMap(t *testing.T) {

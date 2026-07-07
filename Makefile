@@ -21,12 +21,6 @@ fmt:
 test:
 	go test ./... -v
 
-
-ARGS ?= file1.json file2.json
-
-run: build
-	$(BIN) $(ARGS)
-
 cover:
 	go test ./... -coverprofile=coverage.out
 	go tool cover -func=coverage.out

@@ -58,12 +58,14 @@ The `--format` flag supports three output styles:
 Quick examples:
 
 ```bash
-gendiff testdata/fixtures/flat/fileA.json testdata/fixtures/flat/fileB.json
-gendiff --format plain testdata/fixtures/flat/fileA.json testdata/fixtures/flat/fileB.json
-gendiff --format json testdata/fixtures/flat/fileA.json testdata/fixtures/flat/fileB.json
+go run ./cmd/gendiff testdata/fixtures/flat/fileA.json testdata/fixtures/flat/fileB.json
+go run ./cmd/gendiff --format plain testdata/fixtures/flat/fileA.json testdata/fixtures/flat/fileB.json
+go run ./cmd/gendiff --format json testdata/fixtures/flat/fileA.json testdata/fixtures/flat/fileB.json
 ```
 
 ## Examples
+
+Examples below assume `gendiff` is already installed (`make install` or `go install ./cmd/gendiff`).
 
 ### Flat files
 

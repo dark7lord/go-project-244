@@ -1,6 +1,7 @@
 package formatters_test
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -27,6 +28,8 @@ func TestIsValidFormat(t *testing.T) {
 }
 
 func TestNewFormatter(t *testing.T) {
+	singleAddedNodeExpected := readFileToString(t, filepath.Join("testdata", "fixtures", "singleAddedNode.json"))
+
 	tests := []struct {
 		name   string
 		format formatters.OutputFormat
@@ -45,7 +48,7 @@ func TestNewFormatter(t *testing.T) {
 		{
 			name:   string(formatters.JSON),
 			format: formatters.JSON,
-			want:   singleAddedNodeJSON,
+			want:   singleAddedNodeExpected,
 		},
 	}
 

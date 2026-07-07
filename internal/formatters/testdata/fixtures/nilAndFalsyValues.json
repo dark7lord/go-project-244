@@ -1,0 +1,32 @@
+{
+  "type": "nested",
+  "children": [
+    {
+      "key": "addedNull",
+      "type": "added",
+      "newValue": null
+    },
+    {
+      "key": "changedZeroToEmptyString",
+      "type": "changed",
+      "oldValue": 0,
+      "newValue": ""
+    },
+    {
+      "key": "changedNullToFalse",
+      "type": "changed",
+      "oldValue": null,
+      "newValue": false
+    },
+    {
+      "key": "removedNull",
+      "type": "removed",
+      "oldValue": null
+    },
+    {
+      "key": "unchangedNull",
+      "type": "unchanged",
+      "oldValue": null
+    }
+  ]
+}

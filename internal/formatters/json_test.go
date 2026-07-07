@@ -2,6 +2,7 @@ package formatters_test
 
 import (
 	"math"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -36,28 +37,7 @@ func TestJSONFormatter(t *testing.T) {
 					},
 				},
 			},
-			want: `{
-				"type": "nested",
-				"children": [
-					{
-						"key": "added",
-						"type": "added",
-						"newValue": "value"
-					},
-					{
-						"key": "nested",
-						"type": "nested",
-						"children": [
-							{
-								"key": "changed",
-								"type": "changed",
-								"oldValue": "old",
-								"newValue": "new"
-							}
-						]
-					}
-				]
-			}`,
+			path: filepath.Join("testdata", "fixtures", "nestedNode.json"),
 		},
 		{
 			name: testNameEmptyNested,
@@ -91,18 +71,11 @@ func TestJSONFormatterUnknownChildKind(t *testing.T) {
 		},
 	}
 
+	expected := readFileToString(t, filepath.Join("testdata", "fixtures", "unknownChildKind.json"))
 	result, err := formatters.Format(string(formatters.JSON), node)
 
 	require.NoError(t, err)
-	require.JSONEq(t, `{
-		"type": "nested",
-		"children": [
-			{
-				"key": "unknown",
-				"type": "bogus"
-			}
-		]
-	}`, result)
+	require.JSONEq(t, expected, result)
 }
 
 func TestJSONFormatterKeepsNilAndFalsyValues(t *testing.T) {
@@ -139,41 +112,11 @@ func TestJSONFormatterKeepsNilAndFalsyValues(t *testing.T) {
 		},
 	}
 
+	expected := readFileToString(t, filepath.Join("testdata", "fixtures", "nilAndFalsyValues.json"))
 	result, err := formatters.Format(string(formatters.JSON), node)
 
 	require.NoError(t, err)
-	require.JSONEq(t, `{
-		"type": "nested",
-		"children": [
-			{
-				"key": "addedNull",
-				"type": "added",
-				"newValue": null
-			},
-			{
-				"key": "changedZeroToEmptyString",
-				"type": "changed",
-				"oldValue": 0,
-				"newValue": ""
-			},
-			{
-				"key": "changedNullToFalse",
-				"type": "changed",
-				"oldValue": null,
-				"newValue": false
-			},
-			{
-				"key": "removedNull",
-				"type": "removed",
-				"oldValue": null
-			},
-			{
-				"key": "unchangedNull",
-				"type": "unchanged",
-				"oldValue": null
-			}
-		]
-	}`, result)
+	require.JSONEq(t, expected, result)
 }
 
 func TestJSONFormatterMarshalError(t *testing.T) {

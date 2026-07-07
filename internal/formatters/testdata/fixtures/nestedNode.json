@@ -1,0 +1,22 @@
+{
+  "type": "nested",
+  "children": [
+    {
+      "key": "added",
+      "type": "added",
+      "newValue": "value"
+    },
+    {
+      "key": "nested",
+      "type": "nested",
+      "children": [
+        {
+          "key": "changed",
+          "type": "changed",
+          "oldValue": "old",
+          "newValue": "new"
+        }
+      ]
+    }
+  ]
+}

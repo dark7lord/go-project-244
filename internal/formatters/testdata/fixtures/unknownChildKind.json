@@ -1,0 +1,9 @@
+{
+  "type": "nested",
+  "children": [
+    {
+      "key": "unknown",
+      "type": "bogus"
+    }
+  ]
+}

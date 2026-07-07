@@ -1,0 +1,10 @@
+{
+  "type": "nested",
+  "children": [
+    {
+      "key": "Key",
+      "type": "added",
+      "newValue": "value"
+    }
+  ]
+}
