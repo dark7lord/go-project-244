@@ -8,6 +8,17 @@ import (
 	"code/internal/diff"
 )
 
+type stylishFormatter struct{}
+
+func (stylishFormatter) Format(df diff.Node) (string, error) {
+	return renderStylish(df, 0), nil
+}
+
+// NewStylishFormatter returns a formatter that renders diff in stylish format.
+func NewStylishFormatter() Formatter {
+	return stylishFormatter{}
+}
+
 func renderStylishSlice(slice []any, deep int) string {
 	if len(slice) == 0 {
 		return "[]"

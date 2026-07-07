@@ -8,6 +8,17 @@ import (
 	"code/internal/diff"
 )
 
+type plainFormatter struct{}
+
+func (plainFormatter) Format(df diff.Node) (string, error) {
+	return renderPlain(df, []string{}), nil
+}
+
+// NewPlainFormatter returns a formatter that renders diff in plain format.
+func NewPlainFormatter() Formatter {
+	return plainFormatter{}
+}
+
 func renderPlainValue(value any) string {
 	switch value.(type) {
 	case string:
