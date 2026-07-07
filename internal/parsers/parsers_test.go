@@ -121,7 +121,7 @@ func TestNormalizeYAML(t *testing.T) {
 		want any
 	}{
 		{name: "int", v: int(42), want: float64(42)},
-		{name: "string", v: "hello", want: "hello"},
+		{name: "str", v: "hello", want: "hello"},
 		{name: "bool", v: true, want: true},
 		{name: "float64", v: 3.14, want: 3.14},
 		{name: "nil", v: nil, want: nil},
